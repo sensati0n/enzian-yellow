@@ -1,0 +1,18 @@
+{
+  "name": "enzian-yellow",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --watchAll"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.cs19.online/cs19_home/enzian-yellow.git"
+  },
+  "author": "Christian Sturm",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^26.6.3"
+  }
+}
