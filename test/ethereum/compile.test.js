@@ -1,6 +1,10 @@
 const assert = require('assert');
-const web3 = require('web3');
-const compilerOutput = require('./../../ethereum/contract');
+const Web3 = require('web3');
+const ganache = require('ganache-cli');
+
+const web3 = new Web3(ganache.provider({}));
+const compiledContract = require('../../src/ethereum/build/output.json');
+
 
 describe('All contracts are compiled in this stage', () => {
 

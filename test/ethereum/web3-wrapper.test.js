@@ -3,7 +3,7 @@ const Web3 = require('web3');
 const ganache = require('ganache-cli');
 
 const web3 = new Web3(ganache.provider({}));
-const compiledContract = require('./../../ethereum/build/output.json');
+const compiledContract = require('../../src/ethereum/build/output.json');
 
 
 describe('The web3 library is setup correctly', () => {
@@ -46,7 +46,13 @@ describe('The web3 library is setup correctly', () => {
                 assert.ok(receipt.from === accounts[0].toLowerCase());
             })
             .on('confirmation', (confirmationNumber, receipt) => {
-                console.log("CONFIRMATION")
+                assert.ok(typeof confirmationNumber === number);
+                assert.ok(receipt.transactionHash);
+                assert.ok(receipt.blockHash);
+                assert.ok(receipt.blockNumber);
+                assert.ok(receipt.from);
+                assert.ok(receipt.gasUsed);
+
             })
             .then((newContractInstance) => {
                 assert.ok(newContractInstance);
@@ -74,7 +80,7 @@ describe('The web3 library is setup correctly', () => {
         });
 
         it('can call the contract', async () => {
-            const message = await deployedContract.methods.getMessage().call();
+            const message = await deployedContract.methods.message().call();
             assert.strictEqual(message, INITIAL_MESSAGE);
         });
     });
