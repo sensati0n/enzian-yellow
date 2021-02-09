@@ -6,9 +6,9 @@ class Requirements {
         this.obj = obj;
     }
     
-    getRequirementsByTaskName(taskName) {
-        return _.filter(this.obj,  ['task', taskName])[0].requirements;
-        //return _.filter(this.obj, (elem) => {return elem.task.name === taskName })[0].requirements;
+    getRequirementNamesByTaskName(taskName) {
+        return _.filter(this.obj, (elem) => {return elem.task.name === taskName })[0].requirements
+            .map(elem => elem.name);
     }
 
     getGlobalIdByTaskName(taskName) {

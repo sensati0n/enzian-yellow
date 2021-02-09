@@ -47,10 +47,10 @@ describe('we can load simple, block-structured process models', () => {
       assert.strictEqual(feedback.obj.length, 4)
       
       //REQUIREMENTS
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('bpmn:StartEvent'), []);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('A'), ['bpmn:StartEvent']);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('B'), ['A']);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('bpmn:EndEvent'), ['B']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start'), []);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('A'), ['start']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('B'), ['A']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end'), ['B']);
       console.log(feedback);
     });
 
@@ -69,16 +69,16 @@ describe('we can load simple, block-structured process models', () => {
       assert.strictEqual(feedback.obj.length, 10)
 
       //REQUIREMENTS
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('start'), []);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('A'), ['start']);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('B'), ['A']);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('C'), ['B']);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('D'), ['C']);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('E'), ['B']);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('F'), ['D', 'E']);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('G'), ['A']);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('H'), ['G', 'F']);
-      assert.deepStrictEqual(feedback.getRequirementsByTaskName('end'), ['H']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start'), []);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('A'), ['start']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('B'), ['A']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('C'), ['B']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('D'), ['C']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('E'), ['B']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('F'), ['D', 'E']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('G'), ['A']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('H'), ['G', 'F']);
+      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end'), ['H']);
 
     });
 
@@ -121,13 +121,13 @@ describe('we can load more complex, non-block-structured (simple-way) process mo
         assert.strictEqual(feedback.obj.length, 7)
   
         //REQUIREMENTS
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('start'), []);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('A'), ['start']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('B'), ['A']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('C'), ['B']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('D'), ['A']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('end'), ['D']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('end1'), ['C']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start'), []);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('A'), ['start']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('B'), ['A']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('C'), ['B']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('D'), ['A']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end'), ['D']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end1'), ['C']);
 
 
       });
@@ -148,15 +148,15 @@ describe('we can load more complex, non-block-structured (simple-way) process mo
         assert.strictEqual(feedback.obj.length, 9)
   
         //REQUIREMENTS
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('start1'), []);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('start2'), []);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('start3'), []);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('A'), ['start1']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('B'), ['start2']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('C'), ['start3']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('D'), ['A', 'B']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('E'), ['D', 'C']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('bpmn:EndEvent'), ['E']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start1'), []);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start2'), []);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start3'), []);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('A'), ['start1']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('B'), ['start2']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('C'), ['start3']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('D'), ['A', 'B']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('E'), ['D', 'C']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end'), ['E']);
 
       });
     
@@ -176,14 +176,14 @@ describe('we can load more complex, non-block-structured (simple-way) process mo
         assert.strictEqual(feedback.obj.length, 8)
   
         //REQUIREMENTS
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('bpmn:StartEvent'), []);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('A'), ['bpmn:StartEvent']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('B'), ['A']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('C'), ['B']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('D'), ['A']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('E'), ['A']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('F'), ['E', 'C', 'D']);
-        assert.deepStrictEqual(feedback.getRequirementsByTaskName('bpmn:EndEvent'), ['F']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start'), []);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('A'), ['start']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('B'), ['A']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('C'), ['B']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('D'), ['A']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('E'), ['A']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('F'), ['E', 'C', 'D']);
+        assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end'), ['F']);
 
       });
 
@@ -216,15 +216,15 @@ describe('we can load complex, non-block-structured process models', () => {
   //   assert.strictEqual(feedback.obj.length, 9)
 
   //   //REQUIREMENTS
-  //   assert.deepStrictEqual(feedback.getRequirementsByTaskName('start1'), []);
-  //   assert.deepStrictEqual(feedback.getRequirementsByTaskName('start2'), []);
-  //   assert.deepStrictEqual(feedback.getRequirementsByTaskName('start3'), []);
-  //   assert.deepStrictEqual(feedback.getRequirementsByTaskName('A'), ['start1']);
-  //   assert.deepStrictEqual(feedback.getRequirementsByTaskName('B'), ['start2']);
-  //   assert.deepStrictEqual(feedback.getRequirementsByTaskName('C'), ['start3']);
-  //   assert.deepStrictEqual(feedback.getRequirementsByTaskName('D'), ['A', 'B']);
-  //   assert.deepStrictEqual(feedback.getRequirementsByTaskName('E'), ['D', 'C']);
-  //   assert.deepStrictEqual(feedback.getRequirementsByTaskName('bpmn:EndEvent'), ['E']);
+  //   assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start1'), []);
+  //   assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start2'), []);
+  //   assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start3'), []);
+  //   assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('A'), ['start1']);
+  //   assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('B'), ['start2']);
+  //   assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('C'), ['start3']);
+  //   assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('D'), ['A', 'B']);
+  //   assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('E'), ['D', 'C']);
+  //   assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('bpmn:EndEvent'), ['E']);
 
   // });
 
@@ -263,13 +263,13 @@ describe('we can load process models with pools', () => {
     // assert.strictEqual(feedback.obj.length, 7)
 
     // //REQUIREMENTS
-    // assert.deepStrictEqual(feedback.getRequirementsByTaskName('start'), []);
-    // assert.deepStrictEqual(feedback.getRequirementsByTaskName('A'), ['start']);
-    // assert.deepStrictEqual(feedback.getRequirementsByTaskName('B'), ['A']);
-    // assert.deepStrictEqual(feedback.getRequirementsByTaskName('C'), ['B']);
-    // assert.deepStrictEqual(feedback.getRequirementsByTaskName('D'), ['A']);
-    // assert.deepStrictEqual(feedback.getRequirementsByTaskName('end'), ['D']);
-    // assert.deepStrictEqual(feedback.getRequirementsByTaskName('end1'), ['C']);
+    // assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start'), []);
+    // assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('A'), ['start']);
+    // assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('B'), ['A']);
+    // assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('C'), ['B']);
+    // assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('D'), ['A']);
+    // assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end'), ['D']);
+    // assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end1'), ['C']);
 
 
   });
@@ -284,20 +284,20 @@ describe('we can load process models with pools', () => {
     assert.strictEqual(feedback.obj.length, 14)
 
     //REQUIREMENTS
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('start1'), []);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('start2'), []);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('A'), ['start1']);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('B'), ['A']);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('C'), ['B']);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('D'), ['A']);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('E'), ['D', 'F']);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('F'), ['start2']);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('G'), ['F']);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('H'), ['C', 'E']);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('I'), ['H', 'G']);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('J'), ['G']);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('end1'), ['I']);
-    assert.deepStrictEqual(feedback.getRequirementsByTaskName('end2'), ['J']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start1'), []);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start2'), []);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('A'), ['start1']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('B'), ['A']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('C'), ['B']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('D'), ['A']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('E'), ['D', 'F']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('F'), ['start2']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('G'), ['F']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('H'), ['C', 'E']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('I'), ['H', 'G']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('J'), ['G']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end1'), ['I']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end2'), ['J']);
 
 
     // CHECK CORRECT LANE ASSIGNMENT

@@ -72,7 +72,7 @@ function getRequirementsOfElement(element) {
   
   //console.log("REQ:\t", requirements);
 
-  
+  /*
   return {
     "task": element.name? element.name : element.$type ,
     "requirements": requirements.map((r) => {
@@ -81,17 +81,17 @@ function getRequirementsOfElement(element) {
       }
       return r.name? r.name : r.$type
     })};
-
-    /*
+  */
+    
     return {
-      "task": element ,
+      "task": {name: element.name, id: element._id},
       "requirements": requirements.map((r) => {
         if(Array.isArray(r)) {
           return  r.map(rr => rr.name? rr.name : rr.$type);
         }
-        return r.name? r.name : r.$type
+        return {name: r.name, id: r._id}
       })};
-      */
+      
 }
 
 
