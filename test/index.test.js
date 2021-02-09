@@ -1,7 +1,22 @@
 const assert = require('assert');
+const fs = require('fs-extra');
+const path = require('path');
 
-describe('The module toUpperCase', () => {
-  it('should transform my test string', () => {
-    assert.strictEqual('test'.toUpperCase(), 'TEST');
+const { deployProcessModel } = require('./../src/index')
+
+describe('A first Workflow', () => {
+  
+
+  it('combines BPMN parsing and web3 execution', async () => {
+
+
+    //here we are client?
+
+    //client-sided:
+    let gatewayContents = await fs.readFile(
+      path.resolve(__dirname, './resources' , 'gateway.bpmn'), 'utf8');
+
+
   });
+
 });

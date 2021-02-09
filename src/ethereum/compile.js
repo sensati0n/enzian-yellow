@@ -51,6 +51,6 @@ const compileOne = async (fileName) => {
 
 }
 
-compileOne(process.argv.slice(2)[0])
+//compileOne(process.argv.slice(2)[0])
 
-//compileAll();
+compileAll();

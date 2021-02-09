@@ -3,7 +3,7 @@ const _ = require('lodash');
 const path = require('path');
 const fs = require('fs-extra');
 
-const load = require('../../src/bpmn/load');
+const parseBPMN = require('../../src/bpmn/parseBPMN');
 
 describe('We can load BPMN Files', () => {
 
@@ -40,7 +40,7 @@ describe('we can load simple, block-structured process models', () => {
      *  () -> A -> B (())
      */
     it('can parse a simple BPMN model', async () => {
-      let feedback = await load(simpleFileContents);
+      let feedback = await parseBPMN(simpleFileContents);
       assert(feedback);
 
       // 4 BPMN Elements are parsed (Start, A, B, End)
@@ -51,6 +51,7 @@ describe('we can load simple, block-structured process models', () => {
       assert.deepStrictEqual(feedback.getRequirementsByTaskName('A'), ['bpmn:StartEvent']);
       assert.deepStrictEqual(feedback.getRequirementsByTaskName('B'), ['A']);
       assert.deepStrictEqual(feedback.getRequirementsByTaskName('bpmn:EndEvent'), ['B']);
+      console.log(feedback);
     });
 
     /**                   -> C -> D ->
@@ -60,7 +61,7 @@ describe('we can load simple, block-structured process models', () => {
      *            ->                G           ->
      */           
     it('can parse a BPMN model with gateways', async () => {
-      let feedback = await load(gatewayContents);
+      let feedback = await parseBPMN(gatewayContents);
       assert(feedback);
 
       
@@ -113,7 +114,7 @@ describe('we can load more complex, non-block-structured (simple-way) process mo
        */
       it('can parse a model with multiple end events', async () => {
 
-        let feedback = await load(multiEndContents);
+        let feedback = await parseBPMN(multiEndContents);
         assert(feedback);
 
         // 4 BPMN Elements are parsed (start, A, B, C, D, end1, end)
@@ -140,7 +141,7 @@ describe('we can load more complex, non-block-structured (simple-way) process mo
        */
       it('can parse a model with multiple start events', async () => {
 
-        let feedback = await load(multiStartContents);
+        let feedback = await parseBPMN(multiStartContents);
         assert(feedback);
 
         // 4 BPMN Elements are parsed (start1, start2, start3 A, B, C, D, E, bpmn:EndEvent)
@@ -168,7 +169,7 @@ describe('we can load more complex, non-block-structured (simple-way) process mo
        */
       it('can parse a model with multiple gatways following each other', async () => {
 
-        let feedback = await load(multiGatewayContents);
+        let feedback = await parseBPMN(multiGatewayContents);
         assert(feedback);
         
         // 4 BPMN Elements are parsed (start1, start2, start3 A, B, C, D, E, bpmn:EndEvent)
@@ -253,7 +254,7 @@ describe('we can load process models with pools', () => {
    */
   it('can parse a model with a pool', async () => {
 
-    let feedback = await load(poolContents);
+    let feedback = await parseBPMN(poolContents);
     assert(feedback);
 
     console.log(feedback);
@@ -275,7 +276,7 @@ describe('we can load process models with pools', () => {
 
   it('can parse a model with a pool and lanes', async () => {
 
-    let feedback = await load(laneContents);
+    let feedback = await parseBPMN(laneContents);
     assert(feedback);
 
 

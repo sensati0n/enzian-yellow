@@ -6,6 +6,8 @@ var moddle = new BpmnModdle();
 
 let returnvalue;
 
+let globalId = 0;
+
 /**
      * incommingFlows: ['Flow_0gmq9vn']
      * 
@@ -70,6 +72,7 @@ function getRequirementsOfElement(element) {
   
   //console.log("REQ:\t", requirements);
 
+  
   return {
     "task": element.name? element.name : element.$type ,
     "requirements": requirements.map((r) => {
@@ -78,6 +81,17 @@ function getRequirementsOfElement(element) {
       }
       return r.name? r.name : r.$type
     })};
+
+    /*
+    return {
+      "task": element ,
+      "requirements": requirements.map((r) => {
+        if(Array.isArray(r)) {
+          return  r.map(rr => rr.name? rr.name : rr.$type);
+        }
+        return r.name? r.name : r.$type
+      })};
+      */
 }
 
 
@@ -93,7 +107,7 @@ const parseBPMNfile = async (bpmn) => {
 
   const laneElements = _.filter(returnvalue.elementsById, (elem) => {return wantedLanes.includes(elem.$type)});
 
-  console.log(laneElements);
+  //console.log(laneElements);
 
   let laneMap = new Map();
   if(laneElements.length != 0) {
@@ -104,7 +118,7 @@ const parseBPMNfile = async (bpmn) => {
     })
   }
 
-  console.log(laneMap);
+  //console.log(laneMap);
 
 
   //FETCH ALL BPMN ELEMENTS (EXCEPT GATEWAYS - THEIR REQUIREMENTS ARE ENCODED IN THE TASKS)
@@ -122,8 +136,14 @@ const parseBPMNfile = async (bpmn) => {
       Base { '$type': 'bpmn:EndEvent', id: 'Event_182j92b', name: 'end' }
     ]
   */
-  const bpmnElements = _.filter(returnvalue.elementsById, (elem) => {return wantedBpmn.includes(elem.$type)});
+  const bpmnElements = _.filter(returnvalue.elementsById, (elem) => {return wantedBpmn.includes(elem.$type)})
+    .map(elem => {
+      elem._id = globalId++;
+      return elem;
+    });
  
+  //console.log("BPMN", bpmnElements);
+
 
   // element: { '$type': 'bpmn:Task', id: 'Activity_1jq91gf', name: 'A' }
     //console.log("\nELEM:\t", element.name);

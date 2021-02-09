@@ -1,61 +1,29 @@
 const assert = require('assert');
-const Web3 = require('web3');
 const ganache = require('ganache-cli');
+const Web3Wrapper = require('../../src/ethereum/web3-wrapper');
 
-const web3 = new Web3(ganache.provider({}));
-const basicEnzianCompiled = require('../../src/ethereum/build/BasicEnzian.json');
-const { compile } = require('solc');
+const inboxCompiled = require('../../src/ethereum/build/Inbox.json');
 
+describe('The Web3Wrapper works and', () => {
 
-describe('The web3 library is setup correctly', () => {
-
-    let accounts;
+    let web3Wrapper;
+    let my_address;
     let INITIAL_MESSAGE = "Hello, there."
 
     before(async () => {
-        accounts = await web3.eth.getAccounts();
+        web3Wrapper = new Web3Wrapper(ganache.provider({}));
+        await web3Wrapper.init();
+        my_address = web3Wrapper.accounts[0];
     });
     
-    it('and ganache has 10 accounts available', async () => {
-       assert.strictEqual(accounts.length, 10);
-    });
+    it('can deploy a contract', async () => {
 
-    it('can compile a contract', async () => {
+        let newContractInstance = await web3Wrapper.deployContract(inboxCompiled, {
+            arguments: [INITIAL_MESSAGE],
+            from: my_address
+        })
 
-       await new web3.eth.Contract(basicEnzianCompiled.abi)
-            .deploy({
-                data:
-                basicEnzianCompiled.evm.bytecode.object,
-                        arguments: [INITIAL_MESSAGE]
-            })
-            .send({
-                from: accounts[0],
-                gas: 1000000,
-                gasPrice: '30000000000000'
-            }, function(error, transactionHash){  })
-            .on('error', function(error){
-                assert.fail("No error should occur.");
-            })
-            .on('transactionHash', (transactionHash) => {
-                assert.ok(transactionHash.startsWith('0x'));
-            })
-            .on('receipt', (receipt) => {
-                assert.ok(receipt.contractAddress);
-                assert.ok(receipt.gasUsed);
-                assert.ok(receipt.from === accounts[0].toLowerCase());
-            })
-            .on('confirmation', (confirmationNumber, receipt) => {
-                assert.ok(typeof confirmationNumber === number);
-                assert.ok(receipt.transactionHash);
-                assert.ok(receipt.blockHash);
-                assert.ok(receipt.blockNumber);
-                assert.ok(receipt.from);
-                assert.ok(receipt.gasUsed);
-
-            })
-            .then((newContractInstance) => {
-                assert.ok(newContractInstance);
-            });
+        assert(newContractInstance);
 
     });
 
@@ -64,24 +32,18 @@ describe('The web3 library is setup correctly', () => {
         let deployedContract;
         before( async () => {
 
-            deployedContract =  await new web3.eth.Contract(basicEnzianCompiled.abi)
-            .deploy({
-                data:
-                basicEnzianCompiled.evm.bytecode.object,
-                arguments: [INITIAL_MESSAGE]
-            })
-            .send({
-                from: accounts[0],
-                gas: 1000000,
-                gasPrice: '30000000000000'
-
+            deployedContract = await web3Wrapper.deployContract(inboxCompiled, {
+                arguments: [INITIAL_MESSAGE],
+                from: my_address
             });
+
         });
 
         it('can call the contract', async () => {
             const message = await deployedContract.methods.message().call();
             assert.strictEqual(message, INITIAL_MESSAGE);
         });
+
     });
 
 });

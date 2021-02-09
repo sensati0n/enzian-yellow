@@ -1,10 +1,56 @@
+const { create } = require('lodash');
 const Web3 = require('web3');
-const ganache = require('ganache-cli');
 
+/**
+ * Communication with Blockchain.
+ * Does not know anything about bpmn or specific contracts.
+ * 
+ * Holds contracts.
+ * 
+ */
+class Web3Wrapper {
+    
+    constructor(provider) {
+        this.web3 = new Web3(provider);
+        this.initialized = false;
+    }
 
-const web3 = new Web3(ganache.provider({}));
+    async init() {
+        this.accounts = await this.web3.eth.getAccounts();
+        this.initialized = true;
+    }
 
+    async deployContract(compiled, opts) {
+    
+        let returnContract;
 
+        let thecontract = new this.web3.eth.Contract(compiled.abi);
+        let deploy_opt = {
+            data: compiled.evm.bytecode.object,
+            arguments: opts.arguments
+        };
+
+        let transactionObject = await thecontract.deploy(deploy_opt)
+        const estimatedGas = await transactionObject.estimateGas();
+
+        await transactionObject
+        .send({
+            from: opts.from,
+            gas: estimatedGas,
+            gasPrice: '1'
+        }, function(error, transactionHash){  })
+        .on('error', function(error){
+            assert.fail("No error should occur.");
+        })
+        .then((newContractInstance) => {
+            returnContract = newContractInstance;
+        });
+
+        return returnContract;
+    }
+
+    
+}
 
 
 // Assumption: Metamast has already imjected a Web3 instance into the page
@@ -29,31 +75,4 @@ if(typeof window !== 'undefined' && typeof window.web3 !== 'undefined') {
 */
 
 
-const deployContract = async (compiled, account) => {
-
-    
-    let returnContract;
-
-    await new web3.eth.Contract(compiled.abi)
-    .deploy({
-        data: compiled.evm.bytecode.object,
-        arguments: ["INITIAL_MESSAGE"]
-    })
-    .send({
-        from: account,
-        gas: 1000000,
-        gasPrice: '30000000000000'
-    }, function(error, transactionHash){  })
-    .on('error', function(error){
-        assert.fail("No error should occur.");
-    })
-    .then((newContractInstance) => {
-        returnContract = newContractInstance;
-    });
-
-    return returnContract;
-
-}
-
-
-module.exports = {web3, deployContract};
+module.exports = Web3Wrapper;
