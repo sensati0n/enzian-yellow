@@ -4,8 +4,11 @@
   "description": "",
   "main": "./src/index.js",
   "scripts": {
-    "test": "mocha ./test/bpmn/bpmn-loader.test.js",
-    "build": "webpack"
+    "test": "mocha test/**/*.js",
+    "testWeb3": "npm run pretest && mocha test/ethereum/**/*.js",
+    "testBasicEnzian": "node ./src/ethereum/compile.js BasicEnzian.sol && mocha test/ethereum/basic-enzian.test.js",
+    "build": "webpack",
+    "pretest": "node ./src/ethereum/compile.js"
   },
   "repository": {
     "type": "git",

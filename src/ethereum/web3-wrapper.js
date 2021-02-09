@@ -1,4 +1,11 @@
-import Web3 from 'web3'
+const Web3 = require('web3');
+const ganache = require('ganache-cli');
+
+
+const web3 = new Web3(ganache.provider({}));
+
+
+
 
 // Assumption: Metamast has already imjected a Web3 instance into the page
 // !! FALSE FOR 2021 !! AND FOR SERVER-SIDE RENDERING !!
@@ -6,7 +13,8 @@ import Web3 from 'web3'
 //const web3 = new Web3(window.web3.currentProvider);
 
 
-let web3;
+/*
+
 
 if(typeof window !== 'undefined' && typeof window.web3 !== 'undefined') {
     // Executed inside the browser, and metamask is available
@@ -18,5 +26,34 @@ if(typeof window !== 'undefined' && typeof window.web3 !== 'undefined') {
     );
     web3 = new Web3(provider);
 }
+*/
 
-export default web3;
+
+const deployContract = async (compiled, account) => {
+
+    
+    let returnContract;
+
+    await new web3.eth.Contract(compiled.abi)
+    .deploy({
+        data: compiled.evm.bytecode.object,
+        arguments: ["INITIAL_MESSAGE"]
+    })
+    .send({
+        from: account,
+        gas: 1000000,
+        gasPrice: '30000000000000'
+    }, function(error, transactionHash){  })
+    .on('error', function(error){
+        assert.fail("No error should occur.");
+    })
+    .then((newContractInstance) => {
+        returnContract = newContractInstance;
+    });
+
+    return returnContract;
+
+}
+
+
+module.exports = {web3, deployContract};
