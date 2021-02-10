@@ -33,12 +33,12 @@ describe('Test the BasicEnzian Contract', () => {
             it('can deploy single tasks', async () => {
                 
                 await contractInstance.methods
-                    .createTask('A', 0, [], [])
+                    .createTask(0, 'A', 0, [], [])
                     .send({ from: web3Wrapper.accounts[0], gas: 1000000
                 });
 
                 await contractInstance.methods
-                    .createTask('B', 0, [0], [])
+                    .createTask(1, 'B', 0, [0], [])
                     .send({ from: web3Wrapper.accounts[0], gas: 1000000
                 });
                 

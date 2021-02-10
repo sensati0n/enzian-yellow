@@ -12,109 +12,84 @@ contract BasicEnzian {
         uint[] competitors;
     }
     
-    uint globalTaskId = 0;
-
+    // The global Task.ID is mapped to the Task
     mapping(uint => Task) tasks;
-    uint[] public tasksArray;
 
+    //Event for a Task completion.
+    //[FRONTEND] can not read the return value of a function, but events.
+    event TaskCompleted(bool indexed success);
+    
+    /*
+    *
+        EVENT LOGS
+    *
+    */
+    //The EventLog stores the global Task.IDs
+    uint[] public theRealEventLog;
+    function getLog() public view returns(uint[] memory theevents) {
+        return theRealEventLog;
+    }
+
+    // [DEBUGGING] A EventLog containing the Activity-Names of Tasks instead of global IDs
+    string[] public debugStringeventLog;
+    function getDebugStringeventLog() public view returns(string[] memory theevents) {
+        return debugStringeventLog;
+    }
 
 
     /*
     * @Param: Creates a Task
     *
     */
-    function createTask(string memory _activity, 
-                            Tasktype _tasktype,
-                            uint[] memory _requirements,
-                            uint[] memory _competitors) public {
+    function createTask(
+        uint _id,
+        string memory _activity, 
+        Tasktype _tasktype,
+        uint[] memory _requirements,
+        uint[] memory _competitors) public {
                                 
         Task memory myStruct = Task (false, _activity, _tasktype, _requirements, _competitors);
-        tasks[globalTaskId] = (myStruct);
-        globalTaskId++;
+        tasks[_id] = (myStruct);
         
     }
-
-
-    function getTasks()  public view returns (uint[] memory){
-        return tasksArray;
-    }
-
-
+    
+    
     /*
     * @Param: sets a Task on completed if resource equal to taskresource
     */
-    function setTaskOnCompleted(uint _id) public returns (bool success){
-        uint tempcount;
-        //require(tasks[_id].taskresource == msg.sender, "Not the right resource");
+    function completing(uint taskId) public returns (bool success){
+        
+        // uint tempcount;
+        // require(tasks[_id].taskresource == msg.sender, "Not the right resource");
 
-        // if task is already completed return true
-        if (tasks[_id].completed == true) {
-            return true;
-        }
-        uint[] memory temprequire = tasks[_id].requirements;
+
+        uint[] memory temprequire = tasks[taskId].requirements;
         if (temprequire.length == 0) {
-            tasks[_id].completed = true;
-            return true;
+            success = true;
         }
-        //TASK
-        if (tasks[_id].tasktype == Tasktype.TASK) {
-            if (isTaskCompletedById(temprequire[0]) == true) {
-                
-                    tasks[_id].completed = true;
-                    return true;
-            }
-            else {
-                return false;
+        else {
+            //TASK
+            if (tasks[taskId].tasktype == Tasktype.TASK) {
+                if (isTaskCompletedById(temprequire[0]) == true) {
+                    success = true;
+                }
             }
         }
+        
+     
 
-        // ---------- GATES ----------
-        // AND
-        if (tasks[_id].tasktype == Tasktype.AND) {
-            for (uint i = 0; i < temprequire.length; i++) {
-                if (isTaskCompletedById(temprequire[i]) == true) {
-                    tempcount++;
-                }
-            }
-            if (tempcount == temprequire.length) {
-                tasks[_id].completed = true;
-                return true;
-            }
-            else {
-                return false;
-
-            }
+        if(success) {
+            tasks[taskId].completed = true;
+            theRealEventLog.push(taskId);
+            debugStringeventLog.push(tasks[taskId].activity);
+            emit TaskCompleted(true);
         }
-        // atleast 1
-        if (tasks[_id].tasktype == Tasktype.OR) {
-            for (uint j = 0; j < temprequire.length; j++) {
-                if (isTaskCompletedById(temprequire[j]) == true) {
-                    tempcount++;
-                }
-            }
-            if (tempcount > 0) {
-                tasks[_id].completed = true;
-                return true;
-            }
-            else {
-                return false;
-            }
+        else {
+            emit TaskCompleted(false);
         }
-        // exactly 1
-        if (tasks[_id].tasktype == Tasktype.XOR) {
-            for (uint k = 0; k < temprequire.length; k++) {
-                if (isTaskCompletedById(temprequire[k]) == true) {
-                    tempcount++;
-                }
-            }
-            if (tempcount == 1) {
-                tasks[_id].completed = true;
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
+        
+        return success;
+        
     }
 
     /*
@@ -123,42 +98,6 @@ contract BasicEnzian {
     */
     function isTaskCompletedById(uint _id) public view returns (bool success){
           return (tasks[_id].completed);
-    }
-
-    /*
-    * @param: Id of a State
-    * @returns: status and description of the Task
-    */
-    function getTaskById(uint _id) public view
-        returns (
-            bool status,
-            string memory description,
-            Tasktype tasktype,
-            uint[] memory requirements,
-            uint[] memory competitors
-        ) {
-        return (
-            tasks[_id].completed,
-            tasks[_id].activity,
-            tasks[_id].tasktype,
-            tasks[_id].requirements,
-            tasks[_id].competitors);
-    }
-
-    /*
-    * @param: Id
-    * @returns: description of a task
-    */
-    function getTaskActivityById(uint _id) public view returns (string memory){
-        return (tasks[_id].activity);
-    }
-
-    /*
-    * @param: Id
-    * @returns: description of a task
-    */
-    function getTaskRequirementsById(uint _id) public view returns (uint[] memory) {
-        return (tasks[_id].requirements);
     }
 
 }
