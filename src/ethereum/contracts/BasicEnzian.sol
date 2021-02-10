@@ -100,4 +100,15 @@ contract BasicEnzian {
           return (tasks[_id].completed);
     }
 
+    /*
+    * @param: Id of a State
+    * @returns: status and description of the Task
+    */
+    function getTaskById(uint _id) public view returns (bool status,
+        string memory description, Tasktype tasktype,
+        uint[] memory requirements, uint[] memory competitors){
+        return (tasks[_id].completed, tasks[_id].activity,
+         tasks[_id].tasktype, tasks[_id].requirements, tasks[_id].competitors);
+    }
+
 }

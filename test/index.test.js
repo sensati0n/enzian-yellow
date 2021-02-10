@@ -25,17 +25,53 @@ describe('A first Workflow', () => {
       assert(parsedBPMN);
       assert(deployedModel);
 
-      let success = await enzian.executeTask(deployedModel, 2);
+  });
+
+  describe('When a EnzianModel is deployed', () => {
+
+    let enzian, contractInstance;
+
+    beforeEach(async() => {
+      let gatewayContents = await fs.readFile(
+        path.resolve(__dirname, './resources' , 'gateway.bpmn'), 'utf8');
+  
+        enzian = new EnzianYellow(ganache.provider({}))
+  
+        let { parsedBPMN, deployedModel } = await enzian.deployBPMNProcess(gatewayContents);
+
+        assert(parsedBPMN);
+        assert(deployedModel);
+
+        contractInstance = deployedModel;
+    });
+
+    it('executes valid tasks', async () => {
+      let success = await enzian.executeTask(contractInstance, 0);
+      assert(success);
+
+      success = await enzian.executeTask(contractInstance, 1);
+      assert(success);
+
+      success = await enzian.executeTask(contractInstance, 2);
+      assert(success);
+
+      let eventlog = await enzian.eventlog(contractInstance);
+      assert.deepStrictEqual(eventlog, ['start', 'A', 'B']);
+    })
+
+    it('does not execute invalid tasks', async () => {
+      let success = await enzian.executeTask(contractInstance, 2);
       assert(!success);
 
-      success = await enzian.executeTask(deployedModel, 0);
+      success = await enzian.executeTask(contractInstance, 0);
       assert(success);
 
-      success = await enzian.executeTask(deployedModel, 1);
+      success = await enzian.executeTask(contractInstance, 1);
       assert(success);
 
-      let eventlog = await enzian.eventlog(deployedModel);
+      let eventlog = await enzian.eventlog(contractInstance);
       assert.deepStrictEqual(eventlog, ['start', 'A']);
+    })
 
   });
 

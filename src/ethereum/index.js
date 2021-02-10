@@ -32,7 +32,6 @@ class BasicEnzianYellow {
         
         let receipt = await contractInstance.methods.completing(task)
            .send({ from: account, gas: 1000000 })
-        
            return receipt.events.TaskCompleted.returnValues.success;
     }
 

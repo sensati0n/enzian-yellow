@@ -51,7 +51,6 @@ describe('we can load simple, block-structured process models', () => {
       assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('A'), ['start']);
       assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('B'), ['A']);
       assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end'), ['B']);
-      console.log(feedback);
     });
 
     /**                   -> C -> D ->
@@ -257,7 +256,6 @@ describe('we can load process models with pools', () => {
     let feedback = await parseBPMN(poolContents);
     assert(feedback);
 
-    console.log(feedback);
 
     // // 4 BPMN Elements are parsed (start, A, B, C, D, end1, end)
     // assert.strictEqual(feedback.obj.length, 7)

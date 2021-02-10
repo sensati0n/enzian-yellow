@@ -28,9 +28,6 @@ describe('Test the BasicEnzianYellow class', () => {
 
     it('can deploy an enzian process', async () => {
         let contract = await enzian.deployEnzianProcess(parsedBPMN, web3Wrapper.accounts[0]);
-
-        let lastTask = await contract.methods.getTaskById(3).call();
-        console.log('lastTask', lastTask);
     });
 
 });

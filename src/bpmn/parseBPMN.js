@@ -100,6 +100,8 @@ function getRequirementsOfElement(element) {
   //NOT WORKING  "returnvalue.elementsById.filter is not a function" WE HAVE A JSON ELEMENT HERE
 const parseBPMNfile = async (bpmn) => {
 
+  globalId = 0;
+
   // PARSE THE BPMN MODEL
   returnvalue = await moddle.fromXML(bpmn);
 
