@@ -11,6 +11,10 @@ class Requirements {
             .map(elem => elem.name);
     }
 
+    getResourceByTaskName(taskName) {
+        return _.filter(this.obj, (elem) => {return elem.task.name === taskName })[0].task.resource;
+    }
+
     getGlobalIdByTaskName(taskName) {
 
     }

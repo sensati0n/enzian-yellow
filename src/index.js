@@ -23,9 +23,9 @@ class EnzianYellow {
         return { parsedBPMN, deployedModel };
     }
 
-    async executeTask(instance, task) {
+    async executeTask(instance, task, account) {
 
-        return this.basicEnzianYellow.executeTask(instance, task, this.web3Wrapper.accounts[0]);
+        return this.basicEnzianYellow.executeTask(instance, task, account);
     }
 
     async eventlog(instance) {

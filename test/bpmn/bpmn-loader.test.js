@@ -1,9 +1,11 @@
 const assert = require('assert');
+const util = require('util')
 const _ = require('lodash');
 const path = require('path');
 const fs = require('fs-extra');
 
 const parseBPMN = require('../../src/bpmn/parseBPMN');
+const { first } = require('lodash');
 
 describe('We can load BPMN Files', () => {
 
@@ -274,9 +276,14 @@ describe('we can load process models with pools', () => {
 
   it('can parse a model with a pool and lanes', async () => {
 
+    const firstLane = "0xC09Df25ae8Cb470be2455bf9d91eF92fc437732b";
+    const secondLane = "0xCcB73f1F58Ed551169691d91dF2963c429C76c60";
+    const thirdLane = "0x03E1E628870fABfFa154a152B07ed306811c2D6b";
+
     let feedback = await parseBPMN(laneContents);
     assert(feedback);
 
+    // console.log(util.inspect(feedback, false, null, true ));
 
     // 4 BPMN Elements are parsed (start, A, B, C, D, end1, end)
     assert.strictEqual(feedback.obj.length, 14)
@@ -299,6 +306,23 @@ describe('we can load process models with pools', () => {
 
 
     // CHECK CORRECT LANE ASSIGNMENT
+    //REQUIREMENTS
+    assert.strictEqual(feedback.getResourceByTaskName('start1'), firstLane);
+    assert.strictEqual(feedback.getResourceByTaskName('start2'), thirdLane);
+    assert.strictEqual(feedback.getResourceByTaskName('A'), firstLane);
+    assert.strictEqual(feedback.getResourceByTaskName('B'), firstLane);
+    assert.strictEqual(feedback.getResourceByTaskName('C'), firstLane);
+    assert.strictEqual(feedback.getResourceByTaskName('D'), secondLane);
+    assert.strictEqual(feedback.getResourceByTaskName('E'), secondLane);
+    assert.strictEqual(feedback.getResourceByTaskName('F'), thirdLane);
+    assert.strictEqual(feedback.getResourceByTaskName('G'), thirdLane);
+    assert.strictEqual(feedback.getResourceByTaskName('H'), secondLane);
+    assert.strictEqual(feedback.getResourceByTaskName('I'), secondLane);
+    assert.strictEqual(feedback.getResourceByTaskName('J'), thirdLane);
+    assert.strictEqual(feedback.getResourceByTaskName('end1'), secondLane);
+    assert.strictEqual(feedback.getResourceByTaskName('end2'), thirdLane);
+    assert.notStrictEqual(feedback.getResourceByTaskName('end2'), secondLane);
+    assert.notStrictEqual(feedback.getResourceByTaskName('end2'), firstLane);
 
     // FIND A COOL STRUCTURE TO STORE LANE ASSIGNMENT
 

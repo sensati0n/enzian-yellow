@@ -19,8 +19,7 @@ class BasicEnzianYellow {
            let elem = parsedBPMN.obj[count];
 
            await deployedContract.methods.createTask(
-               elem.task.id,
-               elem.task.name, 0, elem.requirements.map(req => req.id), []
+               elem.task.id, elem.task.name, elem.task.resource? elem.task.resource : '0x0000000000000000000000000000000000000000', 0, elem.requirements.map(req => req.id), []
             )
            .send({ from: account, gas: 1000000 });
         }

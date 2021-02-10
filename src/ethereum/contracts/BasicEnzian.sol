@@ -5,8 +5,9 @@ contract BasicEnzian {
     enum Tasktype {TASK, AND, OR, XOR}
 
     struct Task {
-        bool completed;
         string activity;
+        address taskresource;
+        bool completed;
         Tasktype tasktype;
         uint[] requirements;
         uint[] competitors;
@@ -43,16 +44,27 @@ contract BasicEnzian {
     */
     function createTask(
         uint _id,
-        string memory _activity, 
+        string memory _activity,
+        address _taskresource,
         Tasktype _tasktype,
         uint[] memory _requirements,
         uint[] memory _competitors) public {
                                 
-        Task memory myStruct = Task (false, _activity, _tasktype, _requirements, _competitors);
+        Task memory myStruct = Task (_activity, _taskresource, false, _tasktype, _requirements, _competitors);
         tasks[_id] = (myStruct);
-        
     }
     
+        function createTask(
+        uint _id,
+        string memory _activity,
+        Tasktype _tasktype,
+        uint[] memory _requirements,
+        uint[] memory _competitors) public {
+                                
+        Task memory myStruct = Task (_activity, address(0), false, _tasktype, _requirements, _competitors);
+        tasks[_id] = (myStruct);
+    }
+
     
     /*
     * @Param: sets a Task on completed if resource equal to taskresource
@@ -60,7 +72,8 @@ contract BasicEnzian {
     function completing(uint taskId) public returns (bool success){
         
         // uint tempcount;
-        // require(tasks[_id].taskresource == msg.sender, "Not the right resource");
+        address resource = tasks[taskId].taskresource;
+        require(resource == address(0) || resource == msg.sender, tasks[taskId].activity);
 
 
         uint[] memory temprequire = tasks[taskId].requirements;
@@ -105,9 +118,9 @@ contract BasicEnzian {
     * @returns: status and description of the Task
     */
     function getTaskById(uint _id) public view returns (bool status,
-        string memory description, Tasktype tasktype,
+        string memory description, address taskresource, Tasktype tasktype,
         uint[] memory requirements, uint[] memory competitors){
-        return (tasks[_id].completed, tasks[_id].activity,
+        return (tasks[_id].completed, tasks[_id].activity, tasks[_id].taskresource,
          tasks[_id].tasktype, tasks[_id].requirements, tasks[_id].competitors);
     }
 

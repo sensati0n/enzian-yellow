@@ -7,6 +7,7 @@ var moddle = new BpmnModdle();
 let returnvalue;
 
 let globalId = 0;
+let laneMap = new Map();
 
 /**
      * incommingFlows: ['Flow_0gmq9vn']
@@ -69,22 +70,13 @@ function getRequirementsOfElement(element) {
    * ]
    */
   let requirements = getRequirements(incommingFlows);
-  
-  //console.log("REQ:\t", requirements);
 
-  /*
-  return {
-    "task": element.name? element.name : element.$type ,
-    "requirements": requirements.map((r) => {
-      if(Array.isArray(r)) {
-        return  r.map(rr => rr.name? rr.name : rr.$type);
-      }
-      return r.name? r.name : r.$type
-    })};
-  */
-    
+  // If laneMap is available, then get the resource associated with the task.
+  let _resource;
+  _resource = laneMap ? _resource = laneMap.get(element.id) : undefined
+
     return {
-      "task": {name: element.name, id: element._id},
+      "task": {name: element.name, id: element._id, resource: _resource?.name},
       "requirements": requirements.map((r) => {
         if(Array.isArray(r)) {
           return  r.map(rr => rr.name? rr.name : rr.$type);
@@ -109,9 +101,6 @@ const parseBPMNfile = async (bpmn) => {
 
   const laneElements = _.filter(returnvalue.elementsById, (elem) => {return wantedLanes.includes(elem.$type)});
 
-  //console.log(laneElements);
-
-  let laneMap = new Map();
   if(laneElements.length != 0) {
     laneElements.forEach(lane => {
       lane.flowNodeRef.forEach(flowNode => {
@@ -120,7 +109,6 @@ const parseBPMNfile = async (bpmn) => {
     })
   }
 
-  //console.log(laneMap);
 
 
   //FETCH ALL BPMN ELEMENTS (EXCEPT GATEWAYS - THEIR REQUIREMENTS ARE ENCODED IN THE TASKS)
