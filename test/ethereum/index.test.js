@@ -8,6 +8,7 @@ const Web3Wrapper = require('../../src/ethereum/web3-wrapper');
 const parseBPMN = require('../../src/bpmn/parseBPMN');
 
 
+// SEE THE BASIC-ENZIAN.TEST.JS - FILE
 
 describe('Test the BasicEnzianYellow class', () => {
 

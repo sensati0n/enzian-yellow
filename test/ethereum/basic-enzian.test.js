@@ -2,24 +2,27 @@ const assert = require('assert');
 const ganache = require('ganache-cli');
 const Web3Wrapper = require('./../../src/ethereum/web3-wrapper');
 
-const basicEnzianCompiled = require('../../src/ethereum/build/BasicEnzian.json');
+const deployContractAndLibrary = require('../../src/ethereum/deploy-enzian');
 
+const { NULL_ADDRESS } = require('../../src/global');
 
+/**
+ * The BasicEnzian Contract must correctly deploy Process Models (Tasks, ...).
+ * Infrastructural Code is tested here.
+ * For Business Logic Tests, i.e. that Models are executed conformely, see index.test.js
+ */
 describe('Test the BasicEnzian Contract', () => {
-   
-    let web3Wrapper;
     
+    let web3Wrapper;
     let contractInstance;
 
-
-    before(async () => {
+    beforeEach(async () => {
         web3Wrapper = new Web3Wrapper(ganache.provider({}));
         await web3Wrapper.init();
-        contractInstance = await web3Wrapper.deployContract(basicEnzianCompiled, { from: web3Wrapper.accounts[0]  });
-    });
 
-    it('checks that contract is compiled', () => {
-        assert(basicEnzianCompiled);
+        let deployed = await deployContractAndLibrary(web3Wrapper);
+        contractInstance = deployed.basicEnzian;
+    
     });
 
     it('checks that contract is deployed', () => {
@@ -33,61 +36,85 @@ describe('Test the BasicEnzian Contract', () => {
             it('can deploy single tasks', async () => {
                 
                 await contractInstance.methods
-                    .createTask(0, 'A', 0, [], [])
+                    .createTask(0, 'A', NULL_ADDRESS, 0, [], [])
                     .send({ from: web3Wrapper.accounts[0], gas: 1000000
                 });
 
                 await contractInstance.methods
-                    .createTask(1, 'B', 0, [0], [])
+                    .createTask(1, 'B', NULL_ADDRESS, 0, [0], [])
                     .send({ from: web3Wrapper.accounts[0], gas: 1000000
                 });
                 
                 let deployedTask_0 = await contractInstance.methods.getTaskById(0).call();
                 assert.strictEqual(deployedTask_0.status, false);
                 assert.strictEqual(deployedTask_0.description, 'A');
-                assert.strictEqual(deployedTask_0.tasktype, '0');
+                assert.strictEqual(deployedTask_0.gateway, '0');
                 assert.deepStrictEqual(deployedTask_0.requirements, []);
                 assert.deepStrictEqual(deployedTask_0.competitors, []);
 
                 let deployedTask_1 = await contractInstance.methods.getTaskById(1).call();
                 assert.strictEqual(deployedTask_1.status, false);
                 assert.strictEqual(deployedTask_1.description, 'B');
-                assert.strictEqual(deployedTask_1.tasktype, '0');
+                assert.strictEqual(deployedTask_1.gateway, '0');
                 assert.deepStrictEqual(deployedTask_1.requirements, ['0']);
                 assert.deepStrictEqual(deployedTask_1.competitors, []);
 
             });
 
-/*
-                it('can deploy a simple process model', async () => {
-                    
-                    let simpleProcess = {
-                        obj: [
-                          { task: 'start', requirements: [] },
-                          { task: 'A', requirements: ['start'] },
-                          { task: 'B', requirements: ['A'] },
-                          { task: 'end', requirements: ['B'] }
-                        ]
-                      }
-
-                    console.log(contractInstance.methods);
-                    await simpleProcess.obj.forEach(async (elem) => {
-                         contractInstance.createTask(elem.task, 'TASK', elem.requirements, [])
-                        .send({ from: accounts[0], gas: '1000000'});
-                    })
-    
-                    let deployedTasks = await contractInstance.methods.getTasks().call();
-                    console.log(deployedTasks);
-    
-                    
-                });
-*/
-
+            it('can deploy single tasks with decisions', async () => {
                 
+                await contractInstance.methods
+                    .createTaskWithDecision(
+                        0,                  //_id
+                        'A',                //_activity
+                        NULL_ADDRESS,       //_taskresource
+                        0,                  //_pmg
+                        [],                 //_requirements
+                        [],                 //_competitors
+                        {
+                            endBoss: 0,
+                            gatewaytype: 0,
+                            typ: 0,
+                            completed: false,
+                            exists: false,
+                            operator: 0,
+                            integeroperants: {idtoglobalintegerpayload: 0, local: []},
+                            stringoperants: {idtoglobalstringpayload: 0, local: ""}
+                        })
+                    .send({ from: web3Wrapper.accounts[0], gas: 1000000
+                });
+
+                await contractInstance.methods
+                    .createTask(1, 'B', NULL_ADDRESS, 0, [0], [])
+                    .send({ from: web3Wrapper.accounts[0], gas: 1000000
+                });
+                
+                let deployedTask_0 = await contractInstance.methods.getTaskById(0).call();
+                assert.strictEqual(deployedTask_0.status, false);
+                assert.strictEqual(deployedTask_0.description, 'A');
+                assert.strictEqual(deployedTask_0.gateway, '0');
+                assert.deepStrictEqual(deployedTask_0.requirements, []);
+                assert.deepStrictEqual(deployedTask_0.competitors, []);
+
+                let deployedTask_1 = await contractInstance.methods.getTaskById(1).call();
+                assert.strictEqual(deployedTask_1.status, false);
+                assert.strictEqual(deployedTask_1.description, 'B');
+                assert.strictEqual(deployedTask_1.gateway, '0');
+                assert.deepStrictEqual(deployedTask_1.requirements, ['0']);
+                assert.deepStrictEqual(deployedTask_1.competitors, []);
+
             });
 
-        
-        });
+            // Alpha-Test for Linking the Decision Library
+            // TODO: Do this with useful code. decisionTest-method will be removed in future releases.
+            it('can return zwo', async () => {
+                
+                let thenumber = await contractInstance.methods
+                    .decisionTest()
+                    .call();
 
+                assert.deepStrictEqual(thenumber, '12');
+            });
+        });
     });
-    
+});

@@ -9,7 +9,8 @@
     "testBpmn": "mocha test/bpmn/bpmn-loader.test.js",
     "testEthereum": "mocha test/ethereum/index.test.js",
     "testIndex": "npm run pretest && mocha test/index.test.js",
-    "testBasicEnzian": "node ./src/ethereum/compile.js  && mocha test/ethereum/basic-enzian.test.js",
+    "testBasicEnzian": "mocha test/ethereum/basic-enzian.test.js --timeout 5000",
+    "testCompileWrapper": "node ./src/ethereum/compile-wrapper.js",
     "build": "webpack",
     "pretest": "node ./src/ethereum/compile.js"
   },

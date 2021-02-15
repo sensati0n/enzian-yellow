@@ -1,6 +1,6 @@
 const { create } = require('lodash');
 const Web3 = require('web3');
-
+const util = require('util');
 /**
  * Communication with Blockchain.
  * Does not know anything about bpmn or specific contracts.
@@ -29,9 +29,46 @@ class Web3Wrapper {
             data: compiled.evm.bytecode.object,
             arguments: opts.arguments
         };
-
+        // console.log(util.inspect(deploy_opt, false, null, true));
         let transactionObject = await thecontract.deploy(deploy_opt)
         const estimatedGas = await transactionObject.estimateGas();
+
+        await transactionObject
+        .send({
+            from: opts.from,
+            gas: estimatedGas,
+            gasPrice: '1'
+        }, function(error, transactionHash){  })
+        .on('error', function(error){
+            assert.fail("No error should occur.");
+        })
+        .then((newContractInstance) => {
+            returnContract = newContractInstance;
+        });
+
+        return returnContract;
+    }
+
+    
+    async deployContractByAbiAndBytecode(abi, bytecode, opts) {
+    
+        let returnContract;
+
+        let thecontract = new this.web3.eth.Contract(abi);
+        let deploy_opt = {
+            data: bytecode,
+            arguments: opts.arguments
+        };
+        // console.log(util.inspect(deploy_opt, false, null, true));
+        let transactionObject = await thecontract.deploy(deploy_opt)
+        const estimatedGas = await transactionObject.estimateGas({gas: 5000000}, function(error, gasAmount){
+            if(gasAmount == 5000000)
+                console.log('Method ran out of gas');
+
+            if(error) {
+                console.log('ERROR', error);
+            }
+        });
 
         await transactionObject
         .send({

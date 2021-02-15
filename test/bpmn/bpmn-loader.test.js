@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs-extra');
 
 const parseBPMN = require('../../src/bpmn/parseBPMN');
-const { first } = require('lodash');
+
 
 describe('We can load BPMN Files', () => {
 
@@ -17,7 +17,7 @@ describe('We can load BPMN Files', () => {
       
         assert(simpleFileContents);
 
-    })
+    });
 });
 
 /**
@@ -61,25 +61,28 @@ describe('we can load simple, block-structured process models', () => {
      *  () -> A +                                   + -> H -> (())
      *            ->                G           ->
      */           
-    it('can parse a BPMN model with gateways', async () => {
-      let feedback = await parseBPMN(gatewayContents);
-      assert(feedback);
+    it('MÖÖÖRKLcan parse a BPMN model with gateways', async () => {
+      let parsedBPMN = await parseBPMN(gatewayContents);
+      assert(parsedBPMN);
 
+      // console.log(util.inspect(parsedBPMN, false, null, true));
       
       // 4 BPMN Elements are parsed (Start, A, B, C, D, E, F, G, H End)
-      assert.strictEqual(feedback.obj.length, 10)
+      assert.strictEqual(parsedBPMN.obj.length, 10)
 
       //REQUIREMENTS
-      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start'), []);
-      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('A'), ['start']);
-      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('B'), ['A']);
-      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('C'), ['B']);
-      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('D'), ['C']);
-      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('E'), ['B']);
-      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('F'), ['D', 'E']);
-      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('G'), ['A']);
-      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('H'), ['G', 'F']);
-      assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end'), ['H']);
+      assert.deepStrictEqual(parsedBPMN.getRequirementNamesByTaskName('start'), []);
+      assert.deepStrictEqual(parsedBPMN.getRequirementNamesByTaskName('A'), ['start']);
+      assert.deepStrictEqual(parsedBPMN.getRequirementNamesByTaskName('B'), ['A']);
+      assert.deepStrictEqual(parsedBPMN.getRequirementNamesByTaskName('C'), ['B']);
+      assert.deepStrictEqual(parsedBPMN.getRequirementNamesByTaskName('D'), ['C']);
+      assert.deepStrictEqual(parsedBPMN.getRequirementNamesByTaskName('E'), ['B']);
+      assert.deepStrictEqual(parsedBPMN.getRequirementNamesByTaskName('F'), ['D', 'E']);
+      assert.deepStrictEqual(parsedBPMN.getRequirementNamesByTaskName('G'), ['A']);
+      assert.deepStrictEqual(parsedBPMN.getRequirementNamesByTaskName('H'), ['G', 'F']);
+      assert.deepStrictEqual(parsedBPMN.getRequirementNamesByTaskName('end'), ['H']);
+
+
 
     });
 
@@ -329,6 +332,65 @@ describe('we can load process models with pools', () => {
   });
 
 
+
+});
+
+
+describe('we can load process models with decisions', () => {
+
+  let gatewayDecisionSimpleContents, laneDecisionComplexContents;
+
+  before(async () => {
+
+    gatewayDecisionSimpleContents = await fs.readFile(
+      path.resolve(__dirname, '../resources' , 'gateway_decision-simple.bpmn'), 'utf8');
+
+    laneDecisionComplexContents = await fs.readFile(
+      path.resolve(__dirname, '../resources' , 'lane_decision-complex.bpmn'), 'utf8');
+ 
+  });
+
+
+  it('and execute a simple model', async () => {
+
+    let parsedBPMN = await parseBPMN(gatewayDecisionSimpleContents);
+    assert(parsedBPMN);
+    // console.log(util.inspect(parsedBPMN, false, null, true ));
+
+    // DECISIONS
+    assert.deepStrictEqual(parsedBPMN.getDecisionsByTaskName('C'), {
+      decisions: ['i > 5'],
+      lastTask: 'D'
+    });
+    assert.deepStrictEqual(parsedBPMN.getDecisionsByTaskName('E'), {
+      decisions: ['i < 5'],
+      lastTask: 'E'
+    });
+  });
+
+  it('and execute a complex model with pools and lanes', async () => {
+
+    // const firstLane = "0xC09Df25ae8Cb470be2455bf9d91eF92fc437732b";
+    // const secondLane = "0xCcB73f1F58Ed551169691d91dF2963c429C76c60";
+    // const thirdLane = "0x03E1E628870fABfFa154a152B07ed306811c2D6b";
+
+    let parsedBPMN = await parseBPMN(laneDecisionComplexContents);
+    assert(parsedBPMN);
+
+    //console.log(util.inspect(parsedBPMN, false, null, true ));
+
+
+    // DECISIONS
+    assert.deepStrictEqual(parsedBPMN.getDecisionsByTaskName('B'), {
+      decisions: ['i == 5'],
+      lastTask: 'C'
+    });
+
+    assert.deepStrictEqual(parsedBPMN.getDecisionsByTaskName('D'), {
+      decisions: ['i == 6'],
+      lastTask: 'E'
+    });
+  });
 
 });
 

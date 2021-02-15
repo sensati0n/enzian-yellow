@@ -1,6 +1,9 @@
 const BpmnModdle = require('bpmn-moddle');
 var _ = require('lodash');
+const { BpmnGateway } = require('../global');
 const Requirements = require('./requirements');
+const util = require('util');
+const { start } = require('repl');
 
 var moddle = new BpmnModdle();
 
@@ -33,7 +36,7 @@ function getIncommingFlows(element) {
 
 
 function getRequirements(incommingFlows) {
-  
+
       // GET ALL PREDECESSORS OF THE PRECEEDING FLOWS
       return _.filter(returnvalue.references, (reference) => {
         return incommingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
@@ -44,6 +47,7 @@ function getRequirements(incommingFlows) {
          * 'Recursive call': Get all requirements from the gateway
          */
         if(resource.element.$type === 'bpmn:ExclusiveGateway' || resource.element.$type === 'bpmn:ParallelGateway') {
+
           getIncommingFlows(resource.element);
   
           // get all requirements of this flow
@@ -57,7 +61,91 @@ function getRequirements(incommingFlows) {
       });
 }
 
+function getDecisions(incommingFlows) {
+
+  // GET ALL PREDECESSORS OF THE PRECEEDING FLOWS
+  return _.filter(returnvalue.references, (reference) => {
+    return incommingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
+    // MAP TO THE ELEMENT
+  }).flatMap((resource) => {
+
+    /**
+     * 'Recursive call': Get all requirements from the gateway
+     */
+    if(resource.element.$type === 'bpmn:ExclusiveGateway') {
+      let thedecision = resource.element.outgoing.filter(elem => elem.id === resource.id ).map(elem => elem.name);
+      
+      // console.log("DECISION", util.inspect(resource.element.outgoing.filter(elem => elem.id === resource.id), false, null, true));
+      // console.log("DECISION2", util.inspect(resource.element, false, null, true));
+
+      //ModdleElement
+      let startWithSequenceFlowWithDecision = resource.element.outgoing.filter(elem => elem.id === resource.id)[0];
+      let flag = true;
+
+      while(flag) {
+        if(startWithSequenceFlowWithDecision.$type === 'bpmn:SequenceFlow') {
+          if(startWithSequenceFlowWithDecision.targetRef.$type === 'bpmn:ExclusiveGateway') {// ASSUME: CORRESPONDING MERGING
+            startWithSequenceFlowWithDecision = startWithSequenceFlowWithDecision.sourceRef
+          flag = false;
+
+            }
+            else {
+              startWithSequenceFlowWithDecision = startWithSequenceFlowWithDecision.targetRef;
+            }  
+        }
+        else if(startWithSequenceFlowWithDecision.$type === 'bpmn:Task') {
+          startWithSequenceFlowWithDecision = startWithSequenceFlowWithDecision.outgoing[0];
+        }
+        else {
+          // console.error("NOT SUPPORTET");
+          // IGNORE THIS CASES
+          flag = false;
+
+        }
+        
+      }
+
+      return {
+        decisions: thedecision,
+        lastTask: startWithSequenceFlowWithDecision.name
+      };
+    }
+
+
+  });
+}
+
+function getPreceedingTaskOfCorrespondingMergingGateway(SequenceFlowWithDecision) {
+  
+  // 
+
+}
+
+
+function getTasktype(incommingFlows) {
+
+  // GET ALL PREDECESSORS OF THE PRECEEDING FLOWS
+  return _.filter(returnvalue.references, (reference) => {
+    return incommingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
+    // MAP TO THE ELEMENT
+  }).flatMap((resource) => {
+
+      //  console.log("SÖÖÖÖÖÖÖDER\t\t", _.filter(returnvalue.elementsById, (elem) => {return elem.id === resource.element.id}));
+      if(_.filter(returnvalue.elementsById, (elem) => {return elem.id === resource.element.id})[0].incoming?.length > 1) {
+        switch(resource.element.$type) {
+          case 'bpmn:ExclusiveGateway': return BpmnGateway.XOR;
+          case 'bpmn:ParallelGateway': return BpmnGateway.AND;
+          case 'bpmn:InclusiveGateway': return BpmnGateway.OR;
+        }
+      }
+
+  });
+}
+
+
 function getRequirementsOfElement(element) {
+  // console.log("ÄÄLÄÄÄMÄÄÄNT", element.name);
+
   let incommingFlows = getIncommingFlows(element);
       
   //console.log("IF:\t", incommingFlows);
@@ -70,13 +158,18 @@ function getRequirementsOfElement(element) {
    * ]
    */
   let requirements = getRequirements(incommingFlows);
+  let decisions = getDecisions(incommingFlows);
+  let tasktype = getTasktype(incommingFlows)[0];
 
   // If laneMap is available, then get the resource associated with the task.
   let _resource;
   _resource = laneMap ? _resource = laneMap.get(element.id) : undefined
 
     return {
-      "task": {name: element.name, id: element._id, resource: _resource?.name},
+      "task": {name: element.name, id: element._id},
+      "resource": _resource?.name,
+      "decisions": decisions[0]? decisions[0] : undefined,
+      "proceedingMergingGateway": tasktype,
       "requirements": requirements.map((r) => {
         if(Array.isArray(r)) {
           return  r.map(rr => rr.name? rr.name : rr.$type);
@@ -96,7 +189,7 @@ const parseBPMNfile = async (bpmn) => {
 
   // PARSE THE BPMN MODEL
   returnvalue = await moddle.fromXML(bpmn);
-
+  let rv2 = returnvalue;
   let wantedLanes = ['bpmn:Lane']
 
   const laneElements = _.filter(returnvalue.elementsById, (elem) => {return wantedLanes.includes(elem.$type)});
@@ -137,7 +230,7 @@ const parseBPMNfile = async (bpmn) => {
 
   // element: { '$type': 'bpmn:Task', id: 'Activity_1jq91gf', name: 'A' }
     //console.log("\nELEM:\t", element.name);
-    let allRequirements = bpmnElements.map((element) => getRequirementsOfElement(element));
+  let allRequirements = bpmnElements.map((element) => getRequirementsOfElement(element));
     
 
   return new Requirements(allRequirements);

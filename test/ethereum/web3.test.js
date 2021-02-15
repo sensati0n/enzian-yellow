@@ -4,7 +4,10 @@ const Web3 = require('web3');
 const web3 = new Web3(ganache.provider({}));
 const inboxCompiled = require('../../src/ethereum/build/Inbox.json');
 
-
+/**
+ * This Test-Suite uses a simple Test-Contract,
+ * to ensure that the library is set up correctly.
+ */
 describe('The web3 library is setup correctly', () => {
 
     let INITIAL_MESSAGE = "Hello, there."
@@ -60,6 +63,8 @@ describe('The web3 library is setup correctly', () => {
     describe('when a contract is already deployed', () => {
 
         let deployedContract;
+
+        // Deploy the Contract
         before( async () => {
 
             deployedContract =  await new web3.eth.Contract(inboxCompiled.abi)
