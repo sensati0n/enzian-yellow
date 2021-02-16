@@ -15,7 +15,7 @@ const compileOne = async (fileName, libraryaddress) => {
     const buildPath = path.resolve(__dirname, 'build');
     fs.removeSync(buildPath + '\\' + fileName.replace('.sol', '.json'));
 
-        
+    
     const contractPath = path.resolve(__dirname, 'contracts', fileName);
     const source = fs.readFileSync(contractPath, 'UTF-8');
 
@@ -35,8 +35,8 @@ const compileOne = async (fileName, libraryaddress) => {
                 // If remappings are used, this source file should match the global path
                 // after remappings were applied.
                 // If this key is an empty string, that refers to a global level.
-                "DecisionLibrary.sol": {
-                  "DecisionLibrary": libraryaddress
+                'DecisionLibrary.sol': {
+                  'DecisionLibrary': libraryaddress
                 }
               },
             outputSelection: {
@@ -66,29 +66,24 @@ const compileOne = async (fileName, libraryaddress) => {
 
     }
 
-    // console.log(JSON.parse(solc.compile(JSON.stringify(input), { import: findImports })));
-    const output = JSON.parse(solc.compile(JSON.stringify(input), { import: findImports }));
+    const output = JSON.parse(solc.compile(JSON.stringify(input), { import: getDecisionLibrarySource }));
 
     // create build folder if not exists
     fs.ensureDirSync(buildPath);
     fs.outputJsonSync(path.resolve(buildPath,  fileName.replace('.sol', '.json')), output.contracts[fileName][fileName.replace('.sol', '')]);
 
-    for (var contractName in output.contracts[fileName]) {
-        // console.log(contractName + ': ' + output.contracts[fileName][contractName].evm.bytecode.object);
-    }
-
-
     return output.contracts[fileName][fileName.replace('.sol', '')];
 
 }
 
-function findImports(path) {
-    //if (path === 'lib.sol')
+function getDecisionLibrarySource() {
+
+    const source = fs.readFileSync(path.resolve(__dirname, 'contracts', 'DecisionLibrary.sol'), 'UTF-8');
+
       return {
         contents:
-          'library DecisionLibrary { function returnZwo() public pure returns(uint zwo) { return 7; } } '
+        source
       };
-  //  else return { error: 'File not found' };
 }
 
 

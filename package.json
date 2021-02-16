@@ -11,6 +11,7 @@
     "testIndex": "npm run pretest && mocha test/index.test.js",
     "testBasicEnzian": "mocha test/ethereum/basic-enzian.test.js --timeout 5000",
     "testCompileWrapper": "node ./src/ethereum/compile-wrapper.js",
+    "testDeployEnzian": "mocha test/ethereum/deploy-enzian.test.js",
     "build": "webpack",
     "pretest": "node ./src/ethereum/compile.js"
   },

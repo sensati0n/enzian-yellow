@@ -32,7 +32,6 @@ contract BasicEnzian {
 // INFORMATIONAL PERSPECTIVE
     
     enum DecisionType{STRINGDESC,INTDESC,TIMEDESC}
-    enum Operator{LESS,GREATER,EQUAL,NEQ,LEQ,GEQ,ELEMENT}
 
     struct IntegerOperants{
         uint idtoglobalintegerpayload;
@@ -50,7 +49,7 @@ contract BasicEnzian {
         DecisionType typ;
         bool completed;
         bool exists;        
-        Operator operator;
+        DecisionLibrary.Operator operator;
         IntegerOperants integeroperants;
         StringOperants stringoperants;
     }
@@ -59,8 +58,6 @@ contract BasicEnzian {
     // RENAME: PROCESS VARIABLES
     string[] globalStringPayload;
     uint[] globalIntegerPayload;
-    
-
 
     
 // EVENT-LOGS
@@ -108,7 +105,7 @@ contract BasicEnzian {
         uint taskId,
         GatewayType _gatewaytype,
         DecisionType _type,
-        Operator _op,
+        DecisionLibrary.Operator _op,
         IntegerOperants memory _intoperants
     ) public returns (bool success) {
         
@@ -132,6 +129,8 @@ contract BasicEnzian {
         uint[] memory _competitors,
         Decision memory _decision
         ) public {
+
+        // is decision available?
                                 
         Task memory myStruct;
         myStruct.activity = _activity;
@@ -242,6 +241,10 @@ contract BasicEnzian {
         
     }
     
+    function evaluateTest(uint i1, uint[] memory i2, DecisionLibrary.Operator op) public pure returns (bool equality) {
+        return DecisionLibrary.evaluate(i1, i2, op);
+    }
+
     /*
     function evaluateDecision(Decision memory _decision) public view returns (bool success){
         if(_decision.typ == DecisionType.STRINGDESC){

@@ -105,16 +105,187 @@ describe('Test the BasicEnzian Contract', () => {
 
             });
 
-            // Alpha-Test for Linking the Decision Library
-            // TODO: Do this with useful code. decisionTest-method will be removed in future releases.
-            it('can return zwo', async () => {
+            it('can can compare', async () => {
                 
-                let thenumber = await contractInstance.methods
-                    .decisionTest()
-                    .call();
+                let theequality = await contractInstance.methods.evaluateTest(5, [3, 4], 2).call();
 
-                assert.deepStrictEqual(thenumber, '12');
+                assert.deepStrictEqual(theequality, false);
             });
+        });
+
+        /**
+         *                      --  i > 5 --> 2:B -> 3:C  ->
+         * (0:start) -> 1:A -> x                             x -> 5:E -> (6:end)
+         *                      -- i <= 5 -->   4:D       ->
+         */
+        describe('Deploy multiple tasks (i.e. process model) and check the on-chain structure', () => {
+
+            it('BIG PROCESS MODEL', async () => {
+
+                await contractInstance.methods.createTaskWithDecision(
+                    0,                  //_id
+                    'start',                //_activity
+                    NULL_ADDRESS,       //_taskresource
+                    0,                  //_pmg
+                    [],                 //_requirements
+                    [],                 //_competitors
+                    {
+                        endBoss: 0,
+                        gatewaytype: 0,
+                        typ: 0,
+                        completed: false,
+                        exists: false,
+                        operator: 0,
+                        integeroperants: {idtoglobalintegerpayload: 0, local: []},
+                        stringoperants: {idtoglobalstringpayload: 0, local: ""}
+                    })
+                .send({ from: web3Wrapper.accounts[0], gas: 1000000
+            });
+            console.log("Start deployed.");
+
+            await contractInstance.methods.createTaskWithDecision(
+                1,                  //_id
+                'A',                //_activity
+                NULL_ADDRESS,       //_taskresource
+                0,                  //_pmg
+                [0],                 //_requirements
+                [],                 //_competitors
+                {
+                    endBoss: 0,
+                    gatewaytype: 0,
+                    typ: 0,
+                    completed: false,
+                    exists: false,
+                    operator: 0,
+                    integeroperants: {idtoglobalintegerpayload: 0, local: []},
+                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
+                })
+            .send({ from: web3Wrapper.accounts[0], gas: 1000000
+            });
+            console.log("A deployed.");
+
+            await contractInstance.methods.createTaskWithDecision(
+                2,                  //_id
+                'B',                //_activity
+                NULL_ADDRESS,       //_taskresource
+                0,                  //_pmg
+                [1],                 //_requirements
+                [],                 //_competitors
+                {
+                    endBoss: 3,
+                    gatewaytype: 3,
+                    typ: 1,
+                    completed: false,
+                    exists: false,
+                    operator: 1,
+                    integeroperants: {idtoglobalintegerpayload: 0, local: [5]},
+                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
+                })
+            .send({ from: web3Wrapper.accounts[0], gas: 1000000
+            });
+            console.log("B deployed.");
+
+            await contractInstance.methods.createTaskWithDecision(
+                3,                  //_id
+                'C',                //_activity
+                NULL_ADDRESS,       //_taskresource
+                0,                  //_pmg
+                [2],                 //_requirements
+                [],                 //_competitors
+                {
+                    endBoss: 0,
+                    gatewaytype: 0,
+                    typ: 0,
+                    completed: false,
+                    exists: false,
+                    operator: 0,
+                    integeroperants: {idtoglobalintegerpayload: 0, local: []},
+                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
+                })
+            .send({ from: web3Wrapper.accounts[0], gas: 1000000
+            });
+            console.log("C deployed.");
+
+            await contractInstance.methods.createTaskWithDecision(
+                4,                  //_id
+                'D',                //_activity
+                NULL_ADDRESS,       //_taskresource
+                0,                  //_pmg
+                [1],                 //_requirements
+                [],                 //_competitors
+                {
+                    endBoss: 4,
+                    gatewaytype: 3,
+                    typ: 1,
+                    completed: false,
+                    exists: false,
+                    operator: 4,
+                    integeroperants: {idtoglobalintegerpayload: 0, local: [5]},
+                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
+                })
+            .send({ from: web3Wrapper.accounts[0], gas: 1000000
+            });
+            console.log("D deployed.");
+
+            await contractInstance.methods.createTaskWithDecision(
+                5,                  //_id
+                'E',                //_activity
+                NULL_ADDRESS,       //_taskresource
+                3,                  //_pmg
+                [3, 4],                 //_requirements
+                [],                 //_competitors
+                {
+                    endBoss: 0,
+                    gatewaytype: 0,
+                    typ: 0,
+                    completed: false,
+                    exists: false,
+                    operator: 0,
+                    integeroperants: {idtoglobalintegerpayload: 0, local: []},
+                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
+                })
+            .send({ from: web3Wrapper.accounts[0], gas: 1000000
+            });
+            console.log("E deployed.");
+
+            await contractInstance.methods.createTaskWithDecision(
+                6,                  //_id
+                'end',                //_activity
+                NULL_ADDRESS,       //_taskresource
+                0,                  //_pmg
+                [5],                 //_requirements
+                [],                 //_competitors
+                {
+                    endBoss: 0,
+                    gatewaytype: 0,
+                    typ: 0,
+                    completed: false,
+                    exists: false,
+                    operator: 0,
+                    integeroperants: {idtoglobalintegerpayload: 0, local: []},
+                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
+                })
+            .send({ from: web3Wrapper.accounts[0], gas: 1000000
+            });
+            console.log("End deployed.");
+
+
+            await contractInstance.methods.completing(0).send({ from: web3Wrapper.accounts[0], gas: 1000000 });
+            await contractInstance.methods.completing(1).send({ from: web3Wrapper.accounts[0], gas: 1000000 });
+
+            let eventLog = await contractInstance.methods.getDebugStringeventLog().call({from: web3Wrapper.accounts[0]});
+
+            console.log(eventLog);
+
+            // console.log("let eventlog = await enzian.eventlog(contractInstance);");
+            // console.log(eventlog);
+            assert.deepStrictEqual(eventLog, ['start', 'A']);
+
+
+
+            });
+           
+
         });
     });
 });
