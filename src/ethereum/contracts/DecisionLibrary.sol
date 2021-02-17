@@ -10,7 +10,7 @@ library DecisionLibrary{
     }
 
     // Evaluates a decision based on int
-    function evaluate(uint i1, uint[] memory i2, Operator _op) public pure returns (bool isEqual) {
+    function evaluate(int i1, int[] memory i2, Operator _op) public pure returns (bool isEqual) {
         
         // a < b
         if(_op == Operator.LESS) return i1 < i2[0];

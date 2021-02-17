@@ -5,6 +5,7 @@ const Web3Wrapper = require('./../../src/ethereum/web3-wrapper');
 const deployContractAndLibrary = require('../../src/ethereum/deploy-enzian');
 
 const { NULL_ADDRESS } = require('../../src/global');
+const{ GatewayType, DecisionType, Operator } = require('../../src/contract-consts.js');
 
 /**
  * The BasicEnzian Contract must correctly deploy Process Models (Tasks, ...).
@@ -74,12 +75,13 @@ describe('Test the BasicEnzian Contract', () => {
                         {
                             endBoss: 0,
                             gatewaytype: 0,
-                            typ: 0,
+                            type_: 1,
                             completed: false,
-                            exists: false,
+                            exists: true,
                             operator: 0,
-                            integeroperants: {idtoglobalintegerpayload: 0, local: []},
-                            stringoperants: {idtoglobalstringpayload: 0, local: ""}
+                            processVariable: 'i',
+                            s_value: '',
+                            i_value: [0]
                         })
                     .send({ from: web3Wrapper.accounts[0], gas: 1000000
                 });
@@ -122,44 +124,26 @@ describe('Test the BasicEnzian Contract', () => {
 
             it('BIG PROCESS MODEL', async () => {
 
-                await contractInstance.methods.createTaskWithDecision(
+                await contractInstance.methods.createTask(
                     0,                  //_id
                     'start',                //_activity
                     NULL_ADDRESS,       //_taskresource
                     0,                  //_pmg
                     [],                 //_requirements
-                    [],                 //_competitors
-                    {
-                        endBoss: 0,
-                        gatewaytype: 0,
-                        typ: 0,
-                        completed: false,
-                        exists: false,
-                        operator: 0,
-                        integeroperants: {idtoglobalintegerpayload: 0, local: []},
-                        stringoperants: {idtoglobalstringpayload: 0, local: ""}
-                    })
+                    []                  //_competitors
+)
                 .send({ from: web3Wrapper.accounts[0], gas: 1000000
             });
             console.log("Start deployed.");
 
-            await contractInstance.methods.createTaskWithDecision(
+            await contractInstance.methods.createTask(
                 1,                  //_id
                 'A',                //_activity
                 NULL_ADDRESS,       //_taskresource
                 0,                  //_pmg
                 [0],                 //_requirements
-                [],                 //_competitors
-                {
-                    endBoss: 0,
-                    gatewaytype: 0,
-                    typ: 0,
-                    completed: false,
-                    exists: false,
-                    operator: 0,
-                    integeroperants: {idtoglobalintegerpayload: 0, local: []},
-                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
-                })
+                []                 //_competitors
+               )
             .send({ from: web3Wrapper.accounts[0], gas: 1000000
             });
             console.log("A deployed.");
@@ -174,34 +158,26 @@ describe('Test the BasicEnzian Contract', () => {
                 {
                     endBoss: 3,
                     gatewaytype: 3,
-                    typ: 1,
+                    type_: 1,
                     completed: false,
-                    exists: false,
-                    operator: 1,
-                    integeroperants: {idtoglobalintegerpayload: 0, local: [5]},
-                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
+                    exists: true,
+                    operator: 3,
+                    processVariable: 'i',
+                    s_value: '',
+                    i_value: [5]
                 })
             .send({ from: web3Wrapper.accounts[0], gas: 1000000
             });
             console.log("B deployed.");
 
-            await contractInstance.methods.createTaskWithDecision(
+            await contractInstance.methods.createTask(
                 3,                  //_id
                 'C',                //_activity
                 NULL_ADDRESS,       //_taskresource
                 0,                  //_pmg
                 [2],                 //_requirements
                 [],                 //_competitors
-                {
-                    endBoss: 0,
-                    gatewaytype: 0,
-                    typ: 0,
-                    completed: false,
-                    exists: false,
-                    operator: 0,
-                    integeroperants: {idtoglobalintegerpayload: 0, local: []},
-                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
-                })
+                )
             .send({ from: web3Wrapper.accounts[0], gas: 1000000
             });
             console.log("C deployed.");
@@ -216,63 +192,67 @@ describe('Test the BasicEnzian Contract', () => {
                 {
                     endBoss: 4,
                     gatewaytype: 3,
-                    typ: 1,
+                    type_: 1,
                     completed: false,
-                    exists: false,
+                    exists: true,
                     operator: 4,
-                    integeroperants: {idtoglobalintegerpayload: 0, local: [5]},
-                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
+                    processVariable: 'i',
+                    s_value: '',
+                    i_value: [5]
                 })
             .send({ from: web3Wrapper.accounts[0], gas: 1000000
             });
             console.log("D deployed.");
 
-            await contractInstance.methods.createTaskWithDecision(
+            await contractInstance.methods.createTask(
                 5,                  //_id
                 'E',                //_activity
                 NULL_ADDRESS,       //_taskresource
                 3,                  //_pmg
                 [3, 4],                 //_requirements
                 [],                 //_competitors
-                {
-                    endBoss: 0,
-                    gatewaytype: 0,
-                    typ: 0,
-                    completed: false,
-                    exists: false,
-                    operator: 0,
-                    integeroperants: {idtoglobalintegerpayload: 0, local: []},
-                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
-                })
+                )
             .send({ from: web3Wrapper.accounts[0], gas: 1000000
             });
             console.log("E deployed.");
 
-            await contractInstance.methods.createTaskWithDecision(
+            await contractInstance.methods.createTask(
                 6,                  //_id
                 'end',                //_activity
                 NULL_ADDRESS,       //_taskresource
                 0,                  //_pmg
                 [5],                 //_requirements
-                [],                 //_competitors
-                {
-                    endBoss: 0,
-                    gatewaytype: 0,
-                    typ: 0,
-                    completed: false,
-                    exists: false,
-                    operator: 0,
-                    integeroperants: {idtoglobalintegerpayload: 0, local: []},
-                    stringoperants: {idtoglobalstringpayload: 0, local: ""}
-                })
-            .send({ from: web3Wrapper.accounts[0], gas: 1000000
+                []                 //_competitors
+                )
+                .send({ from: web3Wrapper.accounts[0], gas: 1000000
             });
             console.log("End deployed.");
 
+            // let processVariables = await contractInstance.methods.integer_processVariables(0).call({from: web3Wrapper.accounts[0]});
+            // console.log(processVariables);
+ 
+            let ivalue = await contractInstance.methods.getIntProcessVariableValue("i").call({ from: web3Wrapper.accounts[0] });
+            assert.strictEqual(ivalue, '5');
+            
 
             await contractInstance.methods.completing(0).send({ from: web3Wrapper.accounts[0], gas: 1000000 });
+            console.log("0 COMPLETED");
             await contractInstance.methods.completing(1).send({ from: web3Wrapper.accounts[0], gas: 1000000 });
+            console.log("1 COMPLETED");
+            // await contractInstance.methods.completing(2).send({ from: web3Wrapper.accounts[0], gas: 1000000 });
+            // console.log("2 COMPLETED");
 
+
+            try {
+                await contractInstance.methods.completing(2).send({ from: web3Wrapper.accounts[0], gas: 1000000 });;
+                throw null;
+            }
+            catch (error) {
+                assert(error, "Expected an error but did not get one");
+                //assert(error.message.startsWith('VM Exception while processing transaction: ' + 'revert'), "Expected an error starting with '" + PREFIX + message + "' but got '" + error.message + "' instead");
+            }
+            
+            
             let eventLog = await contractInstance.methods.getDebugStringeventLog().call({from: web3Wrapper.accounts[0]});
 
             console.log(eventLog);
@@ -280,11 +260,7 @@ describe('Test the BasicEnzian Contract', () => {
             // console.log("let eventlog = await enzian.eventlog(contractInstance);");
             // console.log(eventlog);
             assert.deepStrictEqual(eventLog, ['start', 'A']);
-
-
-
             });
-           
 
         });
     });

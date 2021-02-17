@@ -33,32 +33,24 @@ contract BasicEnzian {
     
     enum DecisionType{STRINGDESC,INTDESC,TIMEDESC}
 
-    struct IntegerOperants{
-        uint idtoglobalintegerpayload;
-        uint[] local;
-    }
-
-    struct StringOperants{
-        uint idtoglobalstringpayload;
-        string local;
-    }
-
    struct Decision{
         uint endBoss;
         GatewayType gatewaytype;
-        DecisionType typ;
+        DecisionType type_;
         bool completed;
         bool exists;        
         DecisionLibrary.Operator operator;
-        IntegerOperants integeroperants;
-        StringOperants stringoperants;
+        string processVariable;
+        string s_value;
+        int[] i_value;
     }
 
     
     // RENAME: PROCESS VARIABLES
-    string[] globalStringPayload;
-    uint[] globalIntegerPayload;
-
+    //string[] public string_processVariables;
+    //string[] public integer_processVariables;
+    mapping(string => int) public integer_processVariables;
+    mapping(string => string) public string_processVariables;
     
 // EVENT-LOGS
 
@@ -101,24 +93,6 @@ contract BasicEnzian {
         tasks[_id] = (myStruct);
     }
     
-    function addDecisionToTask(
-        uint taskId,
-        GatewayType _gatewaytype,
-        DecisionType _type,
-        DecisionLibrary.Operator _op,
-        IntegerOperants memory _intoperants
-    ) public returns (bool success) {
-        
-        tasks[taskId].decision.gatewaytype = _gatewaytype;
-        tasks[taskId].decision.typ = _type;
-        tasks[taskId].decision.operator = _op;
-        tasks[taskId].decision.integeroperants = _intoperants;
-        tasks[taskId].decision.exists = true;
-        return true;
-        
-    }
-    
-    
     
      function createTaskWithDecision(
         uint _id,
@@ -130,20 +104,29 @@ contract BasicEnzian {
         Decision memory _decision
         ) public {
 
-        // is decision available?
-                                
-        Task memory myStruct;
-        myStruct.activity = _activity;
-        myStruct.taskresource = _taskresource;
-        myStruct.completed = false;
-        myStruct.preceedingMergingGateway = _pmg;
-        myStruct.requirements = _requirements;
-        myStruct.competitors = _competitors;
-        myStruct.decision = _decision;
-        tasks[_id] = (myStruct);
+        if(_decision.type_ == DecisionType.STRINGDESC) {
+            string_processVariables[_decision.processVariable] = "";
+        } else if(_decision.type_ == DecisionType.INTDESC) {
+            integer_processVariables[_decision.processVariable] = 5;
+        }
+
+        createTask(_id, _activity, _taskresource, _pmg, _requirements, _competitors);
+
+        tasks[_id].decision = _decision;
+
     }
     
+    function updateIntProcessVariable(string calldata variableName, int newValue) public {
+        integer_processVariables[variableName] = newValue;
+    }
     
+    function updateStringProcessVariable(string calldata variableName, string calldata newValue) public {
+        string_processVariables[variableName] = newValue;
+    }
+
+    function getIntProcessVariableValue(string calldata variableName) public view returns (int thevalue) {
+        return integer_processVariables[variableName];
+    }
 
 
     /*
@@ -159,11 +142,13 @@ contract BasicEnzian {
     // INFORMATIONAL PERSPECTIVE
         
         // evaluate Decision
-      //  bool result = evaluateDecision(tasks[taskId].decision);
         
-       // require(result, 'Process Variable is not correct.');
-        // result must be true
-        // else return false;
+        if(tasks[taskId].decision.exists) {
+            bool result = evaluateDecision(tasks[taskId].decision);
+            require(result, 'Process Variable is not correct.');
+        }
+        
+        
         
     // CONTROL-FLOW PERSPECTIVE
     
@@ -241,22 +226,21 @@ contract BasicEnzian {
         
     }
     
-    function evaluateTest(uint i1, uint[] memory i2, DecisionLibrary.Operator op) public pure returns (bool equality) {
+    function evaluateTest(int i1, int[] memory i2, DecisionLibrary.Operator op) public pure returns (bool equality) {
         return DecisionLibrary.evaluate(i1, i2, op);
     }
 
-    /*
     function evaluateDecision(Decision memory _decision) public view returns (bool success){
-        if(_decision.typ == DecisionType.STRINGDESC){
-            string memory stringpayload = globalStringPayload[_decision.stringoperants.idtoglobalstringpayload];
-            return DecisionLibrary.evaluate(stringpayload,_decision.operator, _decision.stringoperants.local);
+        if(_decision.type_ == DecisionType.STRINGDESC){
+            string memory valueOfProcessVariable = string_processVariables[_decision.processVariable];
+            return DecisionLibrary.evaluate(valueOfProcessVariable, _decision.s_value, _decision.operator);
         }
-        else if(_decision.typ == DecisionType.INTDESC){
-            uint intpayload = globalIntegerPayload[_decision.integeroperants.idtoglobalintegerpayload];
-            return DecisionLibrary.evaluate(intpayload, _decision.operator, _decision.integeroperants.local);
+        else if(_decision.type_ == DecisionType.INTDESC){
+            int valueOfProcessVariable = integer_processVariables[_decision.processVariable];
+            return DecisionLibrary.evaluate(valueOfProcessVariable, _decision.i_value, _decision.operator);
         }
     }    
-    */
+    
     
 // -------------------------------
 // GETTER
