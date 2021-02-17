@@ -72,7 +72,7 @@ function getDecisions(incommingFlows) {
     /**
      * 'Recursive call': Get all requirements from the gateway
      */
-    if(resource.element.$type === 'bpmn:ExclusiveGateway') {
+    if(resource.element.$type === 'bpmn:ExclusiveGateway' && resource.element.incoming.length == 1) {
       let thedecision = resource.element.outgoing.filter(elem => elem.id === resource.id ).map(elem => elem.name);
       
       // console.log("DECISION", util.inspect(resource.element.outgoing.filter(elem => elem.id === resource.id), false, null, true));
