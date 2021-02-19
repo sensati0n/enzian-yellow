@@ -40,7 +40,8 @@ class BasicEnzianYellow {
                 elem.resource? elem.resource : '0x0000000000000000000000000000000000000000',
                 elem.proceedingMergingGateway? elem.proceedingMergingGateway.id: 0,
                 elem.requirements.map(req => req.id),
-                [],
+                // if competitors are available, map them to their corresponding id in the model and send the array of competitor-ids
+                elem.competitors? _.map(elem.competitors, (ele) => { return parsedBPMN.idByName(ele); }) : [],
                 {
                     //endBoss: elem.decisions.lastTask,
                     endBoss: parseInt(parsedBPMN.idByName(elem.decisions.lastTask)),

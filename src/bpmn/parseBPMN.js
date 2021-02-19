@@ -142,10 +142,27 @@ function getDecisions(incommingFlows) {
   });
 }
 
-function getPreceedingTaskOfCorrespondingMergingGateway(SequenceFlowWithDecision) {
-  
-  // 
+function getCompetitors(incommingFlows) {
 
+     // GET ALL PREDECESSORS OF THE PRECEEDING FLOWS
+     return _.filter(returnvalue.references, (reference) => {
+      return incommingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
+      // MAP TO THE ELEMENT
+    }).flatMap((resource) => {
+
+      /**
+       * 'Recursive call': Get all requirements from the gateway
+       */
+      if(resource.element.$type === 'bpmn:ExclusiveGateway' || resource.element.$type === 'bpmn:InclusiveGateway') {
+
+        return _.map(resource.element.outgoing, (elem) => {
+            return elem.targetRef.name
+        });
+      }
+    });
+
+
+  
 }
 
 
@@ -180,6 +197,7 @@ function getRequirementsOfElement(element) {
    * ]
    */
   let requirements = getRequirements(incommingFlows);
+  let competitors = getCompetitors(incommingFlows);
   let decisions = getDecisions(incommingFlows);
   let tasktype = getTasktype(incommingFlows)[0];
 
@@ -191,6 +209,7 @@ function getRequirementsOfElement(element) {
       "task": {name: element.name, id: element._id},
       "resource": _resource?.name,
       "decisions": decisions[0]? decisions[0] : undefined,
+      "competitors": competitors[0]? competitors : undefined,
       "proceedingMergingGateway": tasktype,
       "requirements": requirements.map((r) => {
         if(Array.isArray(r)) {

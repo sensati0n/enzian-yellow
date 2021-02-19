@@ -158,7 +158,7 @@ contract BasicEnzian {
     */
     function completing(uint taskId) public returns (bool success){
 
-                                emit Test(35);
+        require(!tasks[taskId].completed, "DO NOT REPEAT TASKS!!!");
 
     uint endBoss = 0;
     Task memory thetask = tasks[taskId];
@@ -181,9 +181,11 @@ contract BasicEnzian {
     
         uint[] memory requiredTasksIds = tasks[taskId].requirements;
         if (requiredTasksIds.length == 0) {
+
             success = true;
         }
         else {
+
             GatewayType gateway = tasks[taskId].preceedingMergingGateway;
             
             if (gateway == GatewayType.NONE) {
@@ -192,6 +194,7 @@ contract BasicEnzian {
                 }
             }
             else {
+
                 uint fulfilledRequirements;
                 // HOW MANY REQUIREMENTS ARE FULFILLED?
                for (uint i = 0; i < requiredTasksIds.length; i++) {
@@ -209,8 +212,6 @@ contract BasicEnzian {
                     
                 }
                 else {
-                    
-
                     // enabled müssen erfüllt sein
                     // enabled ist,
                     //  decision stores
@@ -222,20 +223,19 @@ contract BasicEnzian {
                         success = true;
                     }
                     else if(gateway == GatewayType.XOR) {
+
                        for (uint i = 0; i < requiredTasksIds.length; i++) {
 
+                            // requirements of tasks following a merging gateway:
+                            // tasks following an split gateway must store the end boss and set the required flag to true;
+                            // NO! better: gateway (give it not--> ) decision stores end boss   
                             if (enabled[requiredTasksIds[i]]) {
                                 emit Test(taskId);
                                 emit Test(requiredTasksIds[i]);
                                 success = isTaskCompletedById(requiredTasksIds[i]);
                             }
                         }
-
-                         //LOCKING
-        
-                        // requirements of tasks following a merging gateway:
-                        // tasks following an split gateway must store the end boss and set the required flag to true;
-                        // NO! better: gateway (give it not--> ) decision stores end boss
+ 
                     }
                     
                 } // END ELSE GATEWAY DECISION
@@ -245,7 +245,20 @@ contract BasicEnzian {
         if(success) {
             if(tasks[taskId].decision.exists) {
                 enabled[endBoss] = true;
+
+                emit Test(1100);
+                emit Test(thetask.competitors.length);
+
+                //LOCKING
+                for (uint i = 0; i < thetask.competitors.length; i++) {
+                    emit Test(i);
+                    emit Test(thetask.competitors[i]);
+
+                    tasks[(thetask.competitors[i])].completed = true;
+                }       
+
             }
+
             debugStringeventLog.push(thetask.activity);    
             tasks[taskId].completed = true;
             theRealEventLog.push(taskId);
