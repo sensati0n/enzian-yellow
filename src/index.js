@@ -28,6 +28,10 @@ class EnzianYellow {
         return this.basicEnzianYellow.executeTask(instance, task, account);
     }
 
+    async updateProcessVariable(instance, variableName, newValue, account) {
+        return this.basicEnzianYellow.updateProcessVariable(instance, variableName, newValue, account);
+    }
+
     async eventlog(instance) {
         return this.basicEnzianYellow.eventlog(instance);
     }

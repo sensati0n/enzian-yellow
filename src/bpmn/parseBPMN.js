@@ -75,9 +75,6 @@ function getDecisions(incommingFlows) {
     if(resource.element.$type === 'bpmn:ExclusiveGateway' && resource.element.incoming.length == 1) {
       let thedecision = resource.element.outgoing.filter(elem => elem.id === resource.id ).map(elem => elem.name);
       
-      // console.log("DECISION", util.inspect(resource.element.outgoing.filter(elem => elem.id === resource.id), false, null, true));
-      // console.log("DECISION2", util.inspect(resource.element, false, null, true));
-
       //ModdleElement
       let startWithSequenceFlowWithDecision = resource.element.outgoing.filter(elem => elem.id === resource.id)[0];
       let flag = true;
@@ -100,15 +97,45 @@ function getDecisions(incommingFlows) {
           // console.error("NOT SUPPORTET");
           // IGNORE THIS CASES
           flag = false;
-
         }
-        
       }
 
-      return {
-        decisions: thedecision,
-        lastTask: startWithSequenceFlowWithDecision.name
-      };
+      //PARSE THE DECISION
+      /*
+      // integer: pVV without ticks
+        pvId OPERATOR 4
+
+        //with element as OPERATOR
+        pvId in [5, 12]
+        pvId in {1, 3, 7, 12}
+      // string: pVV with 'ticks'
+        pVId OPERATOR 'processVariableValue' 
+*/
+      if(thedecision[0]) {
+
+        let processVariable = thedecision[0].split(" ")[0];
+        let operator = thedecision[0].split(" ")[1];
+          
+        let localValue = thedecision[0].split(" ")[2];
+      
+        if(!processVariable.startsWith('\'\'')) {
+          localValue = [parseInt(localValue)];
+        }
+
+      
+        return {
+          decisions: {
+            processVariable, operator, localValue
+          },
+          lastTask: startWithSequenceFlowWithDecision.name
+        };
+      
+      }
+      
+
+
+
+     
     }
 
 
@@ -130,7 +157,6 @@ function getTasktype(incommingFlows) {
     // MAP TO THE ELEMENT
   }).flatMap((resource) => {
 
-      //  console.log("SÖÖÖÖÖÖÖDER\t\t", _.filter(returnvalue.elementsById, (elem) => {return elem.id === resource.element.id}));
       if(_.filter(returnvalue.elementsById, (elem) => {return elem.id === resource.element.id})[0].incoming?.length > 1) {
         switch(resource.element.$type) {
           case 'bpmn:ExclusiveGateway': return BpmnGateway.XOR;
@@ -144,12 +170,8 @@ function getTasktype(incommingFlows) {
 
 
 function getRequirementsOfElement(element) {
-  // console.log("ÄÄLÄÄÄMÄÄÄNT", element.name);
 
   let incommingFlows = getIncommingFlows(element);
-      
-  //console.log("IF:\t", incommingFlows);
-  
 
   /**
    * requirements = [
@@ -225,11 +247,6 @@ const parseBPMNfile = async (bpmn) => {
       return elem;
     });
  
-  //console.log("BPMN", bpmnElements);
-
-
-  // element: { '$type': 'bpmn:Task', id: 'Activity_1jq91gf', name: 'A' }
-    //console.log("\nELEM:\t", element.name);
   let allRequirements = bpmnElements.map((element) => getRequirementsOfElement(element));
     
 

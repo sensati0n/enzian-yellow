@@ -29,7 +29,6 @@ class Web3Wrapper {
             data: compiled.evm.bytecode.object,
             arguments: opts.arguments
         };
-        // console.log(util.inspect(deploy_opt, false, null, true));
         let transactionObject = await thecontract.deploy(deploy_opt)
         const estimatedGas = await transactionObject.estimateGas();
 
@@ -59,7 +58,6 @@ class Web3Wrapper {
             data: bytecode,
             arguments: opts.arguments
         };
-        // console.log(util.inspect(deploy_opt, false, null, true));
         let transactionObject = await thecontract.deploy(deploy_opt)
         const estimatedGas = await transactionObject.estimateGas({gas: 5000000}, function(error, gasAmount){
             if(gasAmount == 5000000)

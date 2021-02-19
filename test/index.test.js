@@ -111,6 +111,7 @@ describe('The EnzianYellow-Application', () => {
 
           await enzian.executeTask(contractInstance, enzianModel.idByName('A'), account0);
           await enzian.executeTask(contractInstance, enzianModel.idByName('B'), account0);
+          await enzian.updateProcessVariable(contractInstance, 'i', 5, account0);
           await enzian.executeTask(contractInstance, enzianModel.idByName('C'), account0);
           await enzian.executeTask(contractInstance, enzianModel.idByName('D'), account0);
           await enzian.executeTask(contractInstance, enzianModel.idByName('F'), account0);
@@ -163,37 +164,182 @@ describe('The EnzianYellow-Application', () => {
           assert(parsedBPMN);
           assert(deployedModel);
   
-          //console.log(util.inspect(parsedBPMN, false, null, true ));
           contractInstance = deployedModel;
+          enzianModel = parsedBPMN;
       });
 
       it('allows only valid accounts the execution of tasks', async () => {
         
-        await enzian.executeTask(contractInstance, 0, account0);  // start1
-        await enzian.executeTask(contractInstance, 2, account0);  // A
-        await enzian.executeTask(contractInstance, 5, account1);  // D
-        // E MUST --> F MUST
-        await enzian.executeTask(contractInstance, 1, account2);  // start2
-        await enzian.executeTask(contractInstance, 6, account2);  // F
-        await enzian.executeTask(contractInstance, 7, account1);  // E
-       // await enzian.executeTask(contractInstance, 3, account0);  // B
-       // await enzian.executeTask(contractInstance, 4, account0);  // C
-        await enzian.executeTask(contractInstance, 8, account1);  // H
-        // G MUST BEFORE I
-        await enzian.executeTask(contractInstance, 9, account2);  // G
-        await enzian.executeTask(contractInstance, 12, account1); // I
-        await enzian.executeTask(contractInstance, 10, account2); // J
-        await enzian.executeTask(contractInstance, 11, account2); // end2   
-        await enzian.executeTask(contractInstance, 13, account1); // end1   
-        
-        let eventlog = await enzian.eventlog(contractInstance);
-        // console.log("let eventlog = await enzian.eventlog(contractInstance);");
-        // console.log(eventlog);
-        assert.deepStrictEqual(eventlog, ['start1', 'A', 'D', 'start2', 'F', 'E',  'H', 'G', 'I', 'J', 'end2', 'end1']);
-      });
+
+        let laneBlockContents = await fs.readFile(
+          path.resolve(__dirname, './resources' , 'lane_block.bpmn'), 'utf8');
+    
+          enzian = new EnzianYellow(ganache.provider({
+            "mnemonic": MNEMONIC
+          }))
+    
+          let { parsedBPMN, deployedModel } = await enzian.deployBPMNProcess(laneBlockContents);
+  
+          assert(parsedBPMN);
+          assert(deployedModel);
+  
+          contractInstance = deployedModel;
+          enzianModel = parsedBPMN;
+
+          await enzian.executeTask(contractInstance, enzianModel.idByName('start'), account0);  
+          await enzian.executeTask(contractInstance, enzianModel.idByName('A'), account0);  
+          await enzian.executeTask(contractInstance, enzianModel.idByName('F'), account2);  
+          await enzian.updateProcessVariable(contractInstance, 'i', 6, account0);
+          await enzian.executeTask(contractInstance, enzianModel.idByName('D'), account1);  
+          await enzian.executeTask(contractInstance, enzianModel.idByName('E'), account1);  
+          await enzian.executeTask(contractInstance, enzianModel.idByName('G'), account2);  
+          await enzian.executeTask(contractInstance, enzianModel.idByName('H'), account1);  
+          await enzian.executeTask(contractInstance, enzianModel.idByName('J'), account2);  
+          await enzian.executeTask(contractInstance, enzianModel.idByName('end2'), account2);  
+
+          let eventlog = await enzian.eventlog(contractInstance);
+          assert.deepStrictEqual(eventlog, ['start', 'A', 'F', 'D', 'E', 'G', 'H', 'J', 'end2']);
+        });
     
     }); // END OF ORGANIZATIONAL PERSPECTIVE TEST SUITE
   
+    describe('The Informational Perspective is conformal and the Application', () => {
+      
+
+      beforeEach(async() => {
+        let laneDecisionContents = await fs.readFile(
+          path.resolve(__dirname, './resources' , 'lane_decision-complex.bpmn'), 'utf8');
+    
+          enzian = new EnzianYellow(ganache.provider({
+            "mnemonic": MNEMONIC
+          }))
+    
+          let { parsedBPMN, deployedModel } = await enzian.deployBPMNProcess(laneDecisionContents);
+  
+          assert(parsedBPMN);
+          assert(deployedModel);
+  
+          contractInstance = deployedModel;
+          enzianModel = parsedBPMN;
+      });
+/*
+      describe('in case of splitting gateways', () => {
+        it('checks single integer values', async () => {
+        
+          await enzian.executeTask(contractInstance, enzianModel.idByName('start1'), account0);  // start1
+          await enzian.executeTask(contractInstance, enzianModel.idByName('A'), account0);
+          // i == 0 (initial value)
+          try {
+            await enzian.executeTask(contractInstance, enzianModel.idByName('B'), account0);
+          } catch (error) {
+            assert(error); // TODO: check for revert and message
+          }
+          try {
+            await enzian.executeTask(contractInstance, enzianModel.idByName('D'), account0);
+          } catch (error) {
+            assert(error); // TODO: check for revert and message
+          }
+  
+          await enzian.updateProcessVariable(contractInstance, 'i', 5, account0);
+  
+          try {
+            await enzian.executeTask(contractInstance, enzianModel.idByName('D'), account0);
+          } catch (error) {
+            assert(error); // TODO: check for revert and message
+          }
+  
+          await enzian.executeTask(contractInstance, enzianModel.idByName('B'), account0);
+  
+          let eventlog = await enzian.eventlog(contractInstance);
+          assert.deepStrictEqual(eventlog, ['start1', 'A', 'B']);
+        });
+  
+        it('checks interval integer values', async () => {
+          
+        
+        });
+  
+        it('checks string values', async () => {
+          
+        
+        });
+      });
+*/
+      describe('in case of merging gateways', () => {
+
+        it('checks single integer values', async () => {
+        
+          await enzian.executeTask(contractInstance, enzianModel.idByName('start1'), account0);  // start1
+          await enzian.executeTask(contractInstance, enzianModel.idByName('A'), account0);
+          await enzian.updateProcessVariable(contractInstance, 'i', 5, account0);
+          await enzian.executeTask(contractInstance, enzianModel.idByName('B'), account0);
+          await enzian.executeTask(contractInstance, enzianModel.idByName('C'), account0);
+          await enzian.executeTask(contractInstance, enzianModel.idByName('H'), account1);
+
+          // try {
+          //   await enzian.executeTask(contractInstance, enzianModel.idByName('H'), account0);
+          // } catch (error) {
+          //   assert(error); // TODO: NOT ALLOWED
+          // }
+
+
+          let eventlog = await enzian.eventlog(contractInstance);
+          assert.deepStrictEqual(eventlog, ['start1', 'A', 'B', 'C', 'H']);
+        });
+
+
+        it('NEGATIVE checks single integer values', async () => {
+        
+          await enzian.executeTask(contractInstance, enzianModel.idByName('start1'), account0);  // start1
+          await enzian.executeTask(contractInstance, enzianModel.idByName('A'), account0);
+          await enzian.updateProcessVariable(contractInstance, 'i', 5, account0);
+          await enzian.executeTask(contractInstance, enzianModel.idByName('B'), account0);
+
+          await enzian.executeTask(contractInstance, enzianModel.idByName('H'), account1);
+
+
+          try {
+            await enzian.executeTask(contractInstance, enzianModel.idByName('H'), account1);
+          } catch (error) {
+            console.log(error);
+            assert(error); // TODO: NOT ALLOWED
+            assert(!error); // TODO: NOT ALLOWED
+          }
+
+
+          let eventlog = await enzian.eventlog(contractInstance);
+          assert.deepStrictEqual(eventlog, ['start1', 'A', 'B']);
+        });
+
+  
+        it('checks interval integer values', async () => {
+          
+        
+        });
+  
+        it('checks string values', async () => {
+          
+        
+        });
+
+
+      });
+
+
+      
+
+
+
+    
+    }); // END OF INFORMATIONAL PERSPECTIVE TEST SUITE
+  
+
+
+
+
+
+
+
   }); // END OF MODEL IS ALEADY DEPLOYED.
 
 }); // END OF ENZIAN-APPLICATION TEST-SUITE

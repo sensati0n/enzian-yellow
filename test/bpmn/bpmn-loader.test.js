@@ -65,8 +65,6 @@ describe('we can load simple, block-structured process models', () => {
       let parsedBPMN = await parseBPMN(gatewayContents);
       assert(parsedBPMN);
 
-      // console.log(util.inspect(parsedBPMN, false, null, true));
-      
       // 4 BPMN Elements are parsed (Start, A, B, C, D, E, F, G, H End)
       assert.strictEqual(parsedBPMN.obj.length, 10)
 
@@ -286,10 +284,8 @@ describe('we can load process models with pools', () => {
     let feedback = await parseBPMN(laneContents);
     assert(feedback);
 
-    // console.log(util.inspect(feedback, false, null, true ));
-
     // 4 BPMN Elements are parsed (start, A, B, C, D, end1, end)
-    assert.strictEqual(feedback.obj.length, 14)
+    assert.strictEqual(feedback.obj.length, 15)
 
     //REQUIREMENTS
     assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('start1'), []);
@@ -304,7 +300,8 @@ describe('we can load process models with pools', () => {
     assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('H'), ['C', 'E']);
     assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('I'), ['H', 'G']);
     assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('J'), ['G']);
-    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end1'), ['I']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('K'), ['I']);
+    assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end1'), ['K']);
     assert.deepStrictEqual(feedback.getRequirementNamesByTaskName('end2'), ['J']);
 
 
@@ -321,6 +318,7 @@ describe('we can load process models with pools', () => {
     assert.strictEqual(feedback.getResourceByTaskName('G'), thirdLane);
     assert.strictEqual(feedback.getResourceByTaskName('H'), secondLane);
     assert.strictEqual(feedback.getResourceByTaskName('I'), secondLane);
+    assert.strictEqual(feedback.getResourceByTaskName('K'), secondLane);
     assert.strictEqual(feedback.getResourceByTaskName('J'), thirdLane);
     assert.strictEqual(feedback.getResourceByTaskName('end1'), secondLane);
     assert.strictEqual(feedback.getResourceByTaskName('end2'), thirdLane);
@@ -355,39 +353,47 @@ describe('we can load process models with decisions', () => {
 
     let parsedBPMN = await parseBPMN(gatewayDecisionSimpleContents);
     assert(parsedBPMN);
-    // console.log(util.inspect(parsedBPMN, false, null, true ));
 
     // DECISIONS
     assert.deepStrictEqual(parsedBPMN.getDecisionsByTaskName('C'), {
-      decisions: ['i > 5'],
+      decisions: {
+        processVariable: 'i',
+        operator: '>',
+        localValue: [5]
+      },
       lastTask: 'D'
     });
     assert.deepStrictEqual(parsedBPMN.getDecisionsByTaskName('E'), {
-      decisions: ['i < 5'],
+      decisions: {
+        processVariable: 'i',
+        operator: '<',
+        localValue: [5]
+      },
       lastTask: 'E'
     });
   });
 
   it('and execute a complex model with pools and lanes', async () => {
 
-    // const firstLane = "0xC09Df25ae8Cb470be2455bf9d91eF92fc437732b";
-    // const secondLane = "0xCcB73f1F58Ed551169691d91dF2963c429C76c60";
-    // const thirdLane = "0x03E1E628870fABfFa154a152B07ed306811c2D6b";
-
     let parsedBPMN = await parseBPMN(laneDecisionComplexContents);
     assert(parsedBPMN);
 
-    //console.log(util.inspect(parsedBPMN, false, null, true ));
-
-
     // DECISIONS
     assert.deepStrictEqual(parsedBPMN.getDecisionsByTaskName('B'), {
-      decisions: ['i == 5'],
+      decisions: {
+        processVariable: 'i',
+        operator: '==',
+        localValue: [5]
+      },
       lastTask: 'C'
     });
 
     assert.deepStrictEqual(parsedBPMN.getDecisionsByTaskName('D'), {
-      decisions: ['i == 6'],
+      decisions: {
+        processVariable: 'i',
+        operator: '==',
+        localValue: [6]
+      },
       lastTask: 'E'
     });
   });

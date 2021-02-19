@@ -4,8 +4,8 @@
   "description": "",
   "main": "./src/index.js",
   "scripts": {
-    "test": "mocha test/**/*.js --timeout 5000",
-    "testApp": "mocha test/index.test.js --timeout 5000",
+    "test": "mocha test/**/*.js --timeout 10000",
+    "testApp": "mocha test/index.test.js --timeout 10000",
     "testBpmn": "mocha test/bpmn/bpmn-loader.test.js",
     "testEthereum": "mocha test/ethereum/index.test.js",
     "testIndex": "npm run pretest && mocha test/index.test.js",

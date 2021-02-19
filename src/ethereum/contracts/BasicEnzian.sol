@@ -1,7 +1,7 @@
 pragma solidity 0.8.0;
 
 
-import "DecisionLibrary.sol";
+import "./DecisionLibrary.sol";
 
 contract BasicEnzian {
 
@@ -24,6 +24,8 @@ contract BasicEnzian {
     //Event for a Task completion.
     //[FRONTEND] can not read the return value of a function, but events.
     event TaskCompleted(bool indexed success);
+
+    event Test(uint indexed anumber);
 
 
 // ORGANISATIONAL PERSPECTIVE
@@ -51,6 +53,8 @@ contract BasicEnzian {
     //string[] public integer_processVariables;
     mapping(string => int) public integer_processVariables;
     mapping(string => string) public string_processVariables;
+
+    mapping(uint => bool) public enabled;
     
 // EVENT-LOGS
 
@@ -107,13 +111,33 @@ contract BasicEnzian {
         if(_decision.type_ == DecisionType.STRINGDESC) {
             string_processVariables[_decision.processVariable] = "";
         } else if(_decision.type_ == DecisionType.INTDESC) {
-            integer_processVariables[_decision.processVariable] = 5;
+            integer_processVariables[_decision.processVariable] = 0;
         }
 
         createTask(_id, _activity, _taskresource, _pmg, _requirements, _competitors);
+       // emit Test(100 + _decision.endBoss);
 
-        tasks[_id].decision = _decision;
 
+        Decision memory myStruct;
+        myStruct.endBoss = _decision.endBoss;
+        myStruct.gatewaytype = _decision.gatewaytype;
+        myStruct.type_ = _decision.type_;
+        myStruct.completed = _decision.completed;
+        myStruct.exists = _decision.exists;
+        myStruct.operator = _decision.operator;
+        myStruct.processVariable = _decision.processVariable;
+        myStruct.s_value = _decision.s_value;
+        myStruct.i_value = _decision.i_value ;
+
+
+        tasks[_id].decision = (myStruct);
+       // emit Test(200 + tasks[_id].decision.endBoss);
+
+
+    }
+
+    function getTaskDecisionEndBoss(uint taskid) public view returns (uint theboss) {
+        return tasks[taskid].decision.endBoss;
     }
     
     function updateIntProcessVariable(string calldata variableName, int newValue) public {
@@ -133,7 +157,11 @@ contract BasicEnzian {
     * @Param: sets a Task on completed if resource equal to taskresource
     */
     function completing(uint taskId) public returns (bool success){
-        
+
+                                emit Test(35);
+
+    uint endBoss = 0;
+    Task memory thetask = tasks[taskId];
     // ORGANISATIONAL PERSPECTIVE
         
         address resource = tasks[taskId].taskresource;
@@ -142,13 +170,12 @@ contract BasicEnzian {
     // INFORMATIONAL PERSPECTIVE
         
         // evaluate Decision
-        
+
         if(tasks[taskId].decision.exists) {
+            endBoss = tasks[taskId].decision.endBoss;
             bool result = evaluateDecision(tasks[taskId].decision);
             require(result, 'Process Variable is not correct.');
         }
-        
-        
         
     // CONTROL-FLOW PERSPECTIVE
     
@@ -195,9 +222,15 @@ contract BasicEnzian {
                         success = true;
                     }
                     else if(gateway == GatewayType.XOR) {
-                        if (fulfilledRequirements == 1 || fulfilledRequirements == 2) {
-                            success = true;
+                       for (uint i = 0; i < requiredTasksIds.length; i++) {
+
+                            if (enabled[requiredTasksIds[i]]) {
+                                emit Test(taskId);
+                                emit Test(requiredTasksIds[i]);
+                                success = isTaskCompletedById(requiredTasksIds[i]);
+                            }
                         }
+
                          //LOCKING
         
                         // requirements of tasks following a merging gateway:
@@ -209,13 +242,13 @@ contract BasicEnzian {
             } // END ELSE GATEWAY
         }
         
-
-        
-
         if(success) {
+            if(tasks[taskId].decision.exists) {
+                enabled[endBoss] = true;
+            }
+            debugStringeventLog.push(thetask.activity);    
             tasks[taskId].completed = true;
             theRealEventLog.push(taskId);
-            debugStringeventLog.push(tasks[taskId].activity);
             emit TaskCompleted(true);
         }
         else {
