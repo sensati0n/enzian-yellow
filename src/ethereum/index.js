@@ -45,7 +45,7 @@ class BasicEnzianYellow {
                 {
                     //endBoss: elem.decisions.lastTask,
                     endBoss: parseInt(parsedBPMN.idByName(elem.decisions.lastTask)),
-                    gatewaytype: GatewayType.XOR.id,    // ?
+                    gatewaytype: GatewayType.XOR.id,    // ? 
                     type_: thedecisiontype,      
                     completed: false,                  // ?
                     exists: true,

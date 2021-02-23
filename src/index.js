@@ -1,7 +1,7 @@
 const parseBPMN = require('./bpmn/parseBPMN');
-const { deployContract } = require('../src/ethereum/web3-wrapper');
+const { deployContract } = require('./ethereum/web3-wrapper');
 const basicEnzianCompiled = require('./ethereum/build/BasicEnzian.json');
-const Web3Wrapper = require('../src/ethereum/web3-wrapper');
+const Web3Wrapper = require('./ethereum/web3-wrapper');
 const BasicEnzianYellow = require('./ethereum');
 
 class EnzianYellow {

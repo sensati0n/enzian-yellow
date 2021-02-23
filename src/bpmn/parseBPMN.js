@@ -1,9 +1,8 @@
-const BpmnModdle = require('bpmn-moddle');
 var _ = require('lodash');
 const { BpmnGateway } = require('../global');
 const Requirements = require('./requirements');
-const util = require('util');
-const { start } = require('repl');
+const BpmnModdle = require('./BpmnModdleWrapper');
+
 
 var moddle = new BpmnModdle();
 
@@ -34,7 +33,6 @@ function getIncommingFlows(element) {
       });
 }
 
-
 function getRequirements(incommingFlows) {
 
       // GET ALL PREDECESSORS OF THE PRECEEDING FLOWS
@@ -43,9 +41,7 @@ function getRequirements(incommingFlows) {
         // MAP TO THE ELEMENT
       }).flatMap((resource) => {
   
-        /**
-         * 'Recursive call': Get all requirements from the gateway
-         */
+         // 'Recursive call': Get all requirements from the gateway
         if(resource.element.$type === 'bpmn:ExclusiveGateway' || resource.element.$type === 'bpmn:ParallelGateway') {
 
           getIncommingFlows(resource.element);
@@ -69,9 +65,7 @@ function getDecisions(incommingFlows) {
     // MAP TO THE ELEMENT
   }).flatMap((resource) => {
 
-    /**
-     * 'Recursive call': Get all requirements from the gateway
-     */
+    // 'Recursive call': Get all requirements from the gateway
     if(resource.element.$type === 'bpmn:ExclusiveGateway' && resource.element.incoming.length == 1) {
       let thedecision = resource.element.outgoing.filter(elem => elem.id === resource.id ).map(elem => elem.name);
       
@@ -94,7 +88,6 @@ function getDecisions(incommingFlows) {
           startWithSequenceFlowWithDecision = startWithSequenceFlowWithDecision.outgoing[0];
         }
         else {
-          // console.error("NOT SUPPORTET");
           // IGNORE THIS CASES
           flag = false;
         }
@@ -110,7 +103,7 @@ function getDecisions(incommingFlows) {
         pvId in {1, 3, 7, 12}
       // string: pVV with 'ticks'
         pVId OPERATOR 'processVariableValue' 
-*/
+      */
       if(thedecision[0]) {
 
         let processVariable = thedecision[0].split(" ")[0];
@@ -121,7 +114,6 @@ function getDecisions(incommingFlows) {
         if(!processVariable.startsWith('\'\'')) {
           localValue = [parseInt(localValue)];
         }
-
       
         return {
           decisions: {
@@ -131,13 +123,8 @@ function getDecisions(incommingFlows) {
         };
       
       }
-      
-
-
-
      
     }
-
 
   });
 }
@@ -150,9 +137,7 @@ function getCompetitors(incommingFlows) {
       // MAP TO THE ELEMENT
     }).flatMap((resource) => {
 
-      /**
-       * 'Recursive call': Get all requirements from the gateway
-       */
+      //'Recursive call': Get all requirements from the gateway
       if(resource.element.$type === 'bpmn:ExclusiveGateway' || resource.element.$type === 'bpmn:InclusiveGateway') {
 
         return _.map(resource.element.outgoing, (elem) => {
@@ -160,8 +145,6 @@ function getCompetitors(incommingFlows) {
         });
       }
     });
-
-
   
 }
 
@@ -220,7 +203,6 @@ function getRequirementsOfElement(element) {
       
 }
 
-
   // USING LODASH BECAUSE
   //console.log("END", returnvalue.elementsById.filter(i => i.$type === 'bpmn:Task' || i.$type === 'bpmn:StartEvent'));
   //NOT WORKING  "returnvalue.elementsById.filter is not a function" WE HAVE A JSON ELEMENT HERE
@@ -242,7 +224,6 @@ const parseBPMNfile = async (bpmn) => {
       })   
     })
   }
-
 
 
   //FETCH ALL BPMN ELEMENTS (EXCEPT GATEWAYS - THEIR REQUIREMENTS ARE ENCODED IN THE TASKS)

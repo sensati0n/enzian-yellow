@@ -25,7 +25,7 @@
       <bpmn:incoming>Flow_0jwk44d</bpmn:incoming>
       <bpmn:outgoing>Flow_0xmvgs1</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:sequenceFlow id="Flow_0jwk44d" name="i == 6" sourceRef="Gateway_0isplcx" targetRef="Activity_1lvn8a8" />
+    <bpmn:sequenceFlow id="Flow_0jwk44d" name="i &#62; 6" sourceRef="Gateway_0isplcx" targetRef="Activity_1lvn8a8" />
     <bpmn:task id="Activity_1lc0qzh" name="C">
       <bpmn:incoming>Flow_0k7npmt</bpmn:incoming>
       <bpmn:outgoing>Flow_0x7y3bb</bpmn:outgoing>
@@ -95,7 +95,7 @@
         <di:waypoint x="445" y="260" />
         <di:waypoint x="570" y="260" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="494" y="242" width="28" height="14" />
+          <dc:Bounds x="497" y="242" width="22" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1lgum78_di" bpmnElement="Flow_1lgum78">
