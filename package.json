@@ -5,14 +5,14 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "NODE_ENV=enzian-development mocha test/**/*.js --timeout 10000",
-    "testApp": "NODE_ENV=enzian-development mocha test/index.test.js --timeout 10000",
+    "testApp": "NODE_ENV=enzian-development mocha test/index.test.js --timeout 0",
     "testBpmn": "NODE_ENV=enzian-development mocha test/bpmn/bpmn-loader.test.js",
     "testEthereum": "NODE_ENV=enzian-development mocha test/ethereum/index.test.js",
     "testIndex": "NODE_ENV=enzian-development npm run pretest && mocha test/index.test.js",
     "testBasicEnzian": "NODE_ENV=enzian-development mocha test/ethereum/basic-enzian.test.js --timeout 5000",
     "testCompileWrapper": "NODE_ENV=enzian-development node ./src/ethereum/compile-wrapper.js",
     "testDeployEnzian": "NODE_ENV=enzian-development mocha test/ethereum/deploy-enzian.test.js",
-    "testIntDecisions": "NODE_ENV=enzian-development mocha test/int-decisions.test.js --timeout 5000",
+    "testIntDecisions": "NODE_ENV=enzian-development mocha test/int-decisions.test.js --timeout 0",
     "build": "babel src --out-dir lib --copy-files --no-copy-ignored",
     "pretest": "NODE_ENV=enzian-development node ./src/ethereum/compile.dev.js",
     "initTestNetwork": "node ./src/scripts/initTestNetwork.dev.js"

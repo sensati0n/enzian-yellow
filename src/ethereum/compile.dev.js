@@ -36,8 +36,8 @@ const compileOne = async (fileName, libraryaddress) => {
                         // after remappings were applied.
                         // If this key is an empty string, that refers to a global level.
                         'DecisionLibrary.sol': {
-                        //'DecisionLibrary': libraryaddress
-                        'DecisionLibrary': DECISION_LIBRARY_ROPSTEN
+                        'DecisionLibrary': libraryaddress
+                        //'DecisionLibrary': DECISION_LIBRARY_ROPSTEN
                         }
                     },
                     outputSelection: {
