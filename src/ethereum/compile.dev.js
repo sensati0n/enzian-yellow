@@ -1,6 +1,7 @@
 const path = require('path');
 const solc = require('solc');
 const fs = require('fs-extra');
+const { DECISION_LIBRARY_ROPSTEN } = require('../global');
 
 const compileAll = async () => {
 
@@ -35,8 +36,8 @@ const compileOne = async (fileName, libraryaddress) => {
                         // after remappings were applied.
                         // If this key is an empty string, that refers to a global level.
                         'DecisionLibrary.sol': {
-                        'DecisionLibrary': libraryaddress
-                        //'DecisionLibrary': '0x94dF2208241fbF4c352F004287fAb147125E995a'
+                        //'DecisionLibrary': libraryaddress
+                        'DecisionLibrary': DECISION_LIBRARY_ROPSTEN
                         }
                     },
                     outputSelection: {

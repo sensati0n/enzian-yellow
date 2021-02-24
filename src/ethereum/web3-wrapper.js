@@ -11,7 +11,12 @@ const util = require('util');
 class Web3Wrapper {
     
     constructor(provider) {
-        this.web3 = new Web3(provider);
+        if(provider) {
+            this.web3 = new Web3(provider);
+        }
+        else {
+            this.web3 = new Web3(new Web3.providers.WebsocketProvider("ws://localhost:8545"));
+        }
         this.initialized = false;
     }
 
@@ -39,7 +44,7 @@ class Web3Wrapper {
             gasPrice: '1'
         }, function(error, transactionHash){  })
         .on('error', function(error){
-            assert.fail("No error should occur.");
+            console.err("No error should occur.");
         })
         .then((newContractInstance) => {
             returnContract = newContractInstance;
@@ -75,7 +80,7 @@ class Web3Wrapper {
             gasPrice: '1'
         }, function(error, transactionHash){  })
         .on('error', function(error){
-            assert.fail("No error should occur.");
+            console.err("No error should occur.");
         })
         .then((newContractInstance) => {
             returnContract = newContractInstance;

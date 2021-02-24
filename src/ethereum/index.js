@@ -1,6 +1,5 @@
 const deployContractAndLibrary = require('./deploy-enzian');
-const basicEnzianCompiled = require('./build/BasicEnzian.json');
-const{ GatewayType, DecisionType, Operator, operatorBySymbol } = require('../contract-consts');
+const{ GatewayType, DecisionType, operatorBySymbol } = require('../contract-consts');
 
 
 /**

@@ -1,7 +1,7 @@
 {
-  "name": "enzian-yallow",
-  "version": "0.0.24",
-  "description": "A blockchain-based execution system for BPMN-like Process Models.",
+  "name": "enzian-yellow",
+  "version": "0.1.0",
+  "description": "An Ethereum-based Execution System for BPMN-like Process Models.",
   "main": "lib/index.js",
   "scripts": {
     "test": "NODE_ENV=enzian-development mocha test/**/*.js --timeout 10000",
@@ -14,7 +14,8 @@
     "testDeployEnzian": "NODE_ENV=enzian-development mocha test/ethereum/deploy-enzian.test.js",
     "testIntDecisions": "NODE_ENV=enzian-development mocha test/int-decisions.test.js --timeout 5000",
     "build": "babel src --out-dir lib --copy-files --no-copy-ignored",
-    "pretest": "NODE_ENV=enzian-development node ./src/ethereum/compile.dev.js"
+    "pretest": "NODE_ENV=enzian-development node ./src/ethereum/compile.dev.js",
+    "initTestNetwork": "node ./src/scripts/initTestNetwork.dev.js"
   },
   "repository": {
     "type": "git",
