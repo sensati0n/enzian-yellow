@@ -1,5 +1,6 @@
 const deployContractAndLibrary = require('./deploy-enzian');
 const{ GatewayType, DecisionType, operatorBySymbol } = require('../contract-consts');
+const basicEnzianCompiled = require('./build/BasicEnzian.json');
 
 
 /**
@@ -11,9 +12,15 @@ class BasicEnzianYellow {
         this.web3Wrapper = web3Wrapper;
     }
 
-    async deployEnzianProcess (parsedBPMN, account) {
+    async deployEnzianProcess (parsedBPMN, account, compiled) {
 
-        let deployedContract = await deployContractAndLibrary(this.web3Wrapper);
+        let deployedContract;
+
+        if(compiled) {
+            deployedContract = await deployContractAndLibrary(this.web3Wrapper, compiled);
+        } else {
+            deployedContract = await deployContractAndLibrary(this.web3Wrapper);
+        }
 
        for(let count = 0; count < parsedBPMN.obj.length; count++) {
            let elem = parsedBPMN.obj[count];
@@ -77,6 +84,21 @@ class BasicEnzianYellow {
 
     async eventlog(contractInstance) {
         let eventLog = await contractInstance.methods.getDebugStringeventLog().call({from: this.web3Wrapper.accounts[0]});
+        return eventLog;
+    }
+
+    async executeTaskByAddress(contractAddress, task) {
+
+        var localContractInstance = new this.web3Wrapper.web3.eth.Contract( basicEnzianCompiled.abi, contractAddress);
+        let receipt = await localContractInstance.methods.completing(task)
+        .send({ from: this.web3Wrapper.accounts[0], gas: 1000000 })
+        return receipt.events.TaskCompleted.returnValues.success;
+    }
+
+    async eventlogByAddress(contractAddress) {
+
+        var localContractInstance = new this.web3Wrapper.web3.eth.Contract(basicEnzianCompiled.abi, contractAddress);
+        let eventLog = await localContractInstance.methods.getDebugStringeventLog().call({from: this.web3Wrapper.accounts[0]});
         return eventLog;
     }
 
