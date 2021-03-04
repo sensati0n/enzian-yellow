@@ -32,6 +32,13 @@ class EnzianYellow {
         return deployedModel;
     }
 
+    async deployEnzianModelWithAbiSelfSigned(enzianModel, compiled, privateKey) {
+        console.log("Deploy Contract with private Key ", privateKey);
+        let deployedModel = await this.basicEnzianYellow.deployEnzianProcessSelfSigned(enzianModel, privateKey, compiled);
+
+        return deployedModel;
+    }
+
     async deployBPMNProcess(bpmnModel) {
     
         if(!this.web3Wrapper.initialized) {
@@ -55,6 +62,14 @@ class EnzianYellow {
         }
         return this.basicEnzianYellow.executeTaskByAddress(contractAddress, task);
     }
+
+    async executeTaskBySelfSigned(contractAddress, task, privateKey) {
+        if(!this.web3Wrapper.initialized) {
+            await this.web3Wrapper.init();
+        }
+        return this.basicEnzianYellow.executeTaskByAddressSelfSigned(contractAddress, task, privateKey);
+    }
+
 
     async updateProcessVariable(instance, variableName, newValue, account) {
         return this.basicEnzianYellow.updateProcessVariable(instance, variableName, newValue, account);

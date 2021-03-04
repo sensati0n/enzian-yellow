@@ -1,6 +1,9 @@
 const { create } = require('lodash');
 const Web3 = require('web3');
 const util = require('util');
+const path = require('path');
+
+
 /**
  * Communication with Blockchain.
  * Does not know anything about bpmn or specific contracts.
@@ -11,12 +14,7 @@ const util = require('util');
 class Web3Wrapper {
     
     constructor(provider) {
-        if(provider) {
-            this.web3 = new Web3(provider);
-        }
-        else {
-            this.web3 = new Web3(new Web3.providers.WebsocketProvider("ws://localhost:8545"));
-        }
+        this.web3 = new Web3(provider);
         this.initialized = false;
     }
 
@@ -53,8 +51,32 @@ class Web3Wrapper {
         return returnContract;
     }
 
+    async deployContractSelfSigned(compiled, opts) {
     
-    async deployContractByAbiAndBytecode(abi, bytecode, opts) {
+        var tx = {
+             gas: this.web3.utils.toHex('5000000'),
+             data: compiled.evm.bytecode.object
+            };
+
+            console.log('tx', tx)
+
+        let signed = await this.web3.eth.accounts.signTransaction(tx, 'fd3b3eedc43f46bb1f1ebfdbca2f51669d6aa7f8ec53784968ed2cc0043a7f96')
+        console.log('signed', signed)
+            
+        let returnContract = await this.web3.eth.sendSignedTransaction(signed.rawTransaction)
+        console.log('rc', returnContract)
+
+        return returnContract;
+    }
+
+
+    
+    async deployContractByAbiAndBytecode(abi, bytecode, opts, privateKey) {
+        console.log('deploycontracbyabiandbytecode')
+        console.log('abi', abi)
+        console.log('bc', bytecode)
+        console.log('opts', opts)
+        console.log('pk', privateKey)
     
         let returnContract;
 
@@ -64,29 +86,57 @@ class Web3Wrapper {
             arguments: opts.arguments
         };
         let transactionObject = await thecontract.deploy(deploy_opt)
-        const estimatedGas = await transactionObject.estimateGas({gas: 5000000}, function(error, gasAmount){
-            if(gasAmount == 5000000)
-                console.log('Method ran out of gas');
+      
+        console.log('to', transactionObject)
 
-            if(error) {
-                console.log('ERROR', error);
-            }
-        });
+        if(privateKey) {
+    
+            var tx = {
+                gas: this.web3.utils.toHex('5000000'),
+                data: bytecode
+               };
+   
 
-        await transactionObject
-        .send({
-            from: opts.from,
-            gas: estimatedGas,
-            gasPrice: '1'
-        }, function(error, transactionHash){  })
-        .on('error', function(error){
-            console.err("No error should occur.");
-        })
-        .then((newContractInstance) => {
-            returnContract = newContractInstance;
-        });
+               console.log('tx', tx)
+   
+           let signed = await this.web3.eth.accounts.signTransaction(tx, privateKey)
+           console.log('signed', signed)
+               
+           let returnTx = await this.web3.eth.sendSignedTransaction(signed.rawTransaction)
+           console.log('rtx', returnTx)
+          
+           return returnTx;
 
-        return returnContract;
+
+        }
+        else {
+            console.log('no private key found, using meta mask (opts from)')
+
+            const estimatedGas = await transactionObject.estimateGas({gas: 5000000}, function(error, gasAmount){
+                if(gasAmount == 5000000)
+                    console.log('Method ran out of gas');
+    
+                if(error) {
+                    console.log('ERROR', error);
+                }
+            });
+
+            await transactionObject
+            .send({
+                from: opts.from,
+                gas: estimatedGas,
+                gasPrice: '1'
+            }, function(error, transactionHash){  })
+            .on('error', function(error){
+                console.err("No error should occur.");
+            })
+            .then((newContractInstance) => {
+                returnContract = newContractInstance;
+            });
+    
+            return returnContract;
+        }
+      
     }
 
     
