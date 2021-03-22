@@ -1,6 +1,6 @@
 {
   "name": "enzian-yellow",
-  "version": "0.2.20",
+  "version": "0.2.21",
   "description": "An Ethereum-based Execution System for BPMN-like Process Models.",
   "main": "lib/index.js",
   "scripts": {

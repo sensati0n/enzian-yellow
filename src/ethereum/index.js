@@ -242,7 +242,8 @@ class BasicEnzianYellow {
        let returnTx = await this.web3Wrapper.web3.eth.sendSignedTransaction(signed.rawTransaction)
        console.log('rtx', returnTx)
 
-        return returnTx.events.TaskCompleted.returnValues.success;
+        // return returnTx.events.TaskCompleted.returnValues.success;
+        return returnTx;
     }
 
     async eventlogByAddress(contractAddress) {
