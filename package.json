@@ -1,6 +1,6 @@
 {
   "name": "enzian-yellow",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "description": "An Ethereum-based Execution System for BPMN-like Process Models.",
   "main": "lib/index.js",
   "scripts": {
@@ -15,11 +15,8 @@
     "testIntDecisions": "NODE_ENV=enzian-development mocha test/int-decisions.test.js --timeout 0",
     "build": "babel src --out-dir lib --copy-files --no-copy-ignored",
     "pretest": "NODE_ENV=enzian-development node ./src/ethereum/compile.dev.js",
-    
     "initNetwork": "node ./src/scripts/initNetwork.dev.js",
     "decryptKey": "node ./src/scripts/decryptKey.dev.js"
-
-    
   },
   "repository": {
     "type": "git",
