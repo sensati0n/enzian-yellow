@@ -58,9 +58,9 @@ class Web3Wrapper {
              data: compiled.evm.bytecode.object
             };
 
-            console.log('tx', tx)
+        console.log('tx', tx)
 
-        let signed = await this.web3.eth.accounts.signTransaction(tx, 'fd3b3eedc43f46bb1f1ebfdbca2f51669d6aa7f8ec53784968ed2cc0043a7f96')
+        let signed = await this.web3.eth.accounts.signTransaction(tx, '62188f47cefd16322ab69190a12d9c1fb9f41303bf48abfcd56491bf5594be12')
         console.log('signed', signed)
             
         let returnContract = await this.web3.eth.sendSignedTransaction(signed.rawTransaction)

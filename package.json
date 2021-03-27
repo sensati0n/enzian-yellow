@@ -15,7 +15,8 @@
     "testIntDecisions": "NODE_ENV=enzian-development mocha test/int-decisions.test.js --timeout 0",
     "build": "babel src --out-dir lib --copy-files --no-copy-ignored",
     "pretest": "NODE_ENV=enzian-development node ./src/ethereum/compile.dev.js",
-    "initTestNetwork": "node ./src/scripts/initTestNetwork.dev.js",
+    
+    "initNetwork": "node ./src/scripts/initNetwork.dev.js",
     "decryptKey": "node ./src/scripts/decryptKey.dev.js"
 
     

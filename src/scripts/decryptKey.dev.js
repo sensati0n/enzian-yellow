@@ -1,5 +1,7 @@
 // https://ethereum.stackexchange.com/questions/3720/how-do-i-get-the-raw-private-key-from-my-mist-keystore-file
 
+// NOTE: The keyfile folder, produced with geth is expected to be inside the src/scripts/key folder!
+
 let address = '';
 let password = '';
 
