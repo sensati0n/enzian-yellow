@@ -55,7 +55,9 @@ class Web3Wrapper {
     
         var tx = {
              gas: this.web3.utils.toHex('5000000'),
+             gasPrice :this.web3.utils.toHex("0"),
              data: compiled.evm.bytecode.object
+
             };
 
         console.log('tx', tx)

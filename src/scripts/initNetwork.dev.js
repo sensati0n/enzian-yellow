@@ -1,14 +1,17 @@
 const { compileOne } = require('../ethereum/compile.dev');
 const Web3Wrapper = require("../ethereum/web3-wrapper.js");
 const Web3 = require('web3');
+const config = require("../../config/config")
 
 main = async() => {
 
   // CHRYSALIS
   // This was used to initialize the chrysalis-bpm Blockchain Network.
   // let provider = new Web3(new Web3.providers.HttpProvider('http://85.215.90.101:4191'))
+
   
-  let provider = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:8545'))
+  let provider = new Web3(new Web3.providers.HttpProvider(global.gConfig.node_http_url + ':' +
+      global.gConfig.node_http_port))
   web3Wrapper = new Web3Wrapper(provider);
   await web3Wrapper.init();
 

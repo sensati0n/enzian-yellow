@@ -2,8 +2,10 @@
 
 // NOTE: The keyfile folder, produced with geth is expected to be inside the src/scripts/key folder!
 
-let address = '';
-let password = '';
+const config = require("../../config/config")
+
+let address = global.gConfig.node_account_address;
+let password = global.gConfig.node_account_password;
 
 const keyth = require('keythereum');
 const path = require('path');
