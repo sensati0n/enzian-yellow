@@ -23,7 +23,7 @@ let laneMap = new Map();
      *      }
      * ]
      */
-function getIncommingFlows(element) {
+function getIncomingFlows(element) {
       // GET ALL PRECEEDING FLOWS OF THE CURRNT ELEMENT
       return _.filter(returnvalue.references, (reference) => {
         return reference.id === element.id && reference.property === 'bpmn:targetRef'
@@ -33,21 +33,21 @@ function getIncommingFlows(element) {
       });
 }
 
-function getRequirements(incommingFlows) {
+function getRequirements(incomingFlows) {
 
       // GET ALL PREDECESSORS OF THE PRECEEDING FLOWS
       return _.filter(returnvalue.references, (reference) => {
-        return incommingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
+        return incomingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
         // MAP TO THE ELEMENT
       }).flatMap((resource) => {
   
          // 'Recursive call': Get all requirements from the gateway
         if(resource.element.$type === 'bpmn:ExclusiveGateway' || resource.element.$type === 'bpmn:ParallelGateway') {
 
-          getIncommingFlows(resource.element);
+          getIncomingFlows(resource.element);
   
           // get all requirements of this flow
-          let requirements2 = getRequirements( getIncommingFlows(resource.element));
+          let requirements2 = getRequirements( getIncomingFlows(resource.element));
           return requirements2;
         }
         else {
@@ -57,11 +57,11 @@ function getRequirements(incommingFlows) {
       });
 }
 
-function getDecisions(incommingFlows) {
+function getDecisions(incomingFlows) {
 
   // GET ALL PREDECESSORS OF THE PRECEEDING FLOWS
   return _.filter(returnvalue.references, (reference) => {
-    return incommingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
+    return incomingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
     // MAP TO THE ELEMENT
   }).flatMap((resource) => {
 
@@ -129,11 +129,11 @@ function getDecisions(incommingFlows) {
   });
 }
 
-function getCompetitors(incommingFlows) {
+function getCompetitors(incomingFlows) {
 
      // GET ALL PREDECESSORS OF THE PRECEEDING FLOWS
      return _.filter(returnvalue.references, (reference) => {
-      return incommingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
+      return incomingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
       // MAP TO THE ELEMENT
     }).flatMap((resource) => {
 
@@ -149,11 +149,11 @@ function getCompetitors(incommingFlows) {
 }
 
 
-function getTasktype(incommingFlows) {
+function getTaskType(incomingFlows) {
 
   // GET ALL PREDECESSORS OF THE PRECEEDING FLOWS
   return _.filter(returnvalue.references, (reference) => {
-    return incommingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
+    return incomingFlows.includes(reference.id) && reference.property === 'bpmn:outgoing'
     // MAP TO THE ELEMENT
   }).flatMap((resource) => {
 
@@ -171,7 +171,7 @@ function getTasktype(incommingFlows) {
 
 function getRequirementsOfElement(element) {
 
-  let incommingFlows = getIncommingFlows(element);
+  let incommingFlows = getIncomingFlows(element);
 
   /**
    * requirements = [
@@ -182,7 +182,7 @@ function getRequirementsOfElement(element) {
   let requirements = getRequirements(incommingFlows);
   let competitors = getCompetitors(incommingFlows);
   let decisions = getDecisions(incommingFlows);
-  let tasktype = getTasktype(incommingFlows)[0];
+  let taskType = getTaskType(incommingFlows)[0];
 
   // If laneMap is available, then get the resource associated with the task.
   let _resource;
@@ -193,7 +193,7 @@ function getRequirementsOfElement(element) {
       "resource": _resource?.name,
       "decisions": decisions[0]? decisions[0] : undefined,
       "competitors": competitors[0]? competitors : undefined,
-      "proceedingMergingGateway": tasktype,
+      "proceedingMergingGateway": taskType,
       "requirements": requirements.map((r) => {
         if(Array.isArray(r)) {
           return  r.map(rr => rr.name? rr.name : rr.$type);
