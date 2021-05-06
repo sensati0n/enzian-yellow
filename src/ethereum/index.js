@@ -12,18 +12,18 @@ class BasicEnzianYellow {
         this.web3Wrapper = web3Wrapper;
     }
 
-
+    /**
+     *
+     * @param parsedBPMN
+     * @param account
+     * @param compiled OPTIONAL
+     * @returns {Promise<*|*|*>}
+     */
     async deployEnzianProcess (parsedBPMN, account, compiled) {
+        let deployedContract = await deployContractAndLibrary(this.web3Wrapper, compiled);
 
-        let deployedContract;
 
-        if(compiled) {
-            deployedContract = await deployContractAndLibrary(this.web3Wrapper, compiled);
-        } else {
-            deployedContract = await deployContractAndLibrary(this.web3Wrapper);
-        }
-
-       for(let count = 0; count < parsedBPMN.obj.length; count++) {
+        for(let count = 0; count < parsedBPMN.obj.length; count++) {
            let elem = parsedBPMN.obj[count];
 
            if(!elem.decisions) {
@@ -33,56 +33,56 @@ class BasicEnzianYellow {
                     elem.resource? elem.resource : '0x0000000000000000000000000000000000000000',
                     elem.proceedingMergingGateway? elem.proceedingMergingGateway.id: 0,
                     elem.requirements.map(req => req.id), []
-                )
-                .send({ from: account, gas: 1000000 });
+                ).send({ from: account, gas: 1000000 });
            }
            else {
+               //which decision int vs string
+                let thedecisiontype = elem.decisions.decisions.processVariable.startsWith('\'\'')
+                    ? DecisionType.STRINGDESC.id : DecisionType.INTDESC.id;
 
-            //which decision int vs string
-            let thedecisiontype = elem.decisions.decisions.processVariable.startsWith('\'\'') ? DecisionType.STRINGDESC.id : DecisionType.INTDESC.id;
-
-            await deployedContract.basicEnzian.methods.createTaskWithDecision(
-                elem.task.id,
-                elem.task.name,
-                elem.resource? elem.resource : '0x0000000000000000000000000000000000000000',
-                elem.proceedingMergingGateway? elem.proceedingMergingGateway.id: 0,
-                elem.requirements.map(req => req.id),
-                // if competitors are available, map them to their corresponding id in the model and send the array of competitor-ids
-                elem.competitors? _.map(elem.competitors, (ele) => { return parsedBPMN.idByName(ele); }) : [],
-                {
-                    //endBoss: elem.decisions.lastTask,
-                    endBoss: parseInt(parsedBPMN.idByName(elem.decisions.lastTask)),
-                    gatewaytype: GatewayType.XOR.id,    // ? 
-                    type_: thedecisiontype,      
-                    completed: false,                  // ?
-                    exists: true,
-                    operator: operatorBySymbol(elem.decisions.decisions.operator).id,
-                    processVariable: elem.decisions.decisions.processVariable,
-                    s_value: thedecisiontype == DecisionType.STRINGDESC.id? elem.decisions.decisions.localValue: '',
-                    i_value: thedecisiontype == DecisionType.INTDESC.id? elem.decisions.decisions.localValue: 0,
-                    //  s_value: '',
-                    //  i_value: 0,
+                await deployedContract.basicEnzian.methods.createTaskWithDecision(
+                    elem.task.id,
+                    elem.task.name,
+                    elem.resource? elem.resource : '0x0000000000000000000000000000000000000000',
+                    elem.proceedingMergingGateway? elem.proceedingMergingGateway.id: 0,
+                    elem.requirements.map(req => req.id),
+                    // if competitors are available, map them to their corresponding id in the model and send the array of competitor-ids
+                    elem.competitors? _.map(elem.competitors, (ele) => { return parsedBPMN.idByName(ele); }) : [],
+                    {
+                        //endBoss: elem.decisions.lastTask,
+                        endBoss: parseInt(parsedBPMN.idByName(elem.decisions.lastTask)),
+                        gatewaytype: GatewayType.XOR.id,    // ?
+                        type_: thedecisiontype,
+                        completed: false,                  // ?
+                        exists: true,
+                        operator: operatorBySymbol(elem.decisions.decisions.operator).id,
+                        processVariable: elem.decisions.decisions.processVariable,
+                        s_value: thedecisiontype == DecisionType.STRINGDESC.id? elem.decisions.decisions.localValue: '',
+                        i_value: thedecisiontype == DecisionType.INTDESC.id? elem.decisions.decisions.localValue: 0,
+                        //  s_value: '',
+                        //  i_value: 0,
                     
-                }
-            )
-            .send({ from: account, gas: 1000000 });
+                    }
+                )
+                .send({ from: account, gas: 1000000 });
            }
         }
 
         return deployedContract.basicEnzian;
     }
 
-    async deployEnzianProcessSelfSigned(parsedBPMN, privateKey, compiled) {
+    /**
+     *
+     * @param parsedBPMN
+     * @param privateKey
+     * @param compiled OPTIONAL
+     * @returns {Promise<string>}
+     */
+    async deployEnzianProcessSelfSigned(parsedBPMN, privateKey, compiled = undefined) {
 
         console.log('deployEnzianProcessSelfSigned called with pk', privateKey)
-        let deployedContract;
-
-        if(compiled) {
-            deployedContract = await deployContractAndLibrary(this.web3Wrapper, compiled, privateKey);
-        } else {
-            deployedContract = await deployContractAndLibrary(this.web3Wrapper, privateKey);
-        }
-        console.log('se deployed contracto', deployedContract)
+        let deployedContract = await deployContractAndLibrary(this.web3Wrapper, compiled, privateKey);
+        console.log('the deployed contract: ', deployedContract)
 
         var localContractInstance = new this.web3Wrapper.web3.eth.Contract( basicEnzianCompiled.abi, deployedContract.basicEnzian.contractAddress);
         

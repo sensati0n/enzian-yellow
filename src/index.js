@@ -14,28 +14,24 @@ class EnzianYellow {
         return await parseBPMN(bpmnModel);
     }
 
-    async deployEnzianModel(enzianModel) {
-        if(!this.web3Wrapper.initialized) {
-            await this.web3Wrapper.init();
+    /**
+     *
+     * @param enzianModel
+     * @param compiled OPTIONAL
+     * @param privateKey OPTIONAL
+     * @returns {Promise<*|*|*>}
+     */
+    async deployEnzianModel(enzianModel, compiled = undefined, privateKey = undefined) {
+        let deployedModel;
+
+        if(privateKey){
+            deployedModel = await this.basicEnzianYellow.deployEnzianProcessSelfSigned(enzianModel, privateKey, compiled);
+        } else {
+            if(!this.web3Wrapper.initialized) await this.web3Wrapper.init();
+
+            console.log("Deploy Contract with account ", this.web3Wrapper.accounts[0]);
+            deployedModel = await this.basicEnzianYellow.deployEnzianProcess(enzianModel, this.web3Wrapper.accounts[0], compiled);
         }
-        let deployedModel = await this.basicEnzianYellow.deployEnzianProcess(enzianModel, this.web3Wrapper.accounts[0]);
-
-        return deployedModel;
-    }
-
-    async deployEnzianModelWithAbi(enzianModel, compiled) {
-        if(!this.web3Wrapper.initialized) {
-            await this.web3Wrapper.init();
-        }
-        console.log("Deploy Contract with account ", this.web3Wrapper.accounts[0]);
-        let deployedModel = await this.basicEnzianYellow.deployEnzianProcess(enzianModel, this.web3Wrapper.accounts[0], compiled);
-
-        return deployedModel;
-    }
-
-    async deployEnzianModelWithAbiSelfSigned(enzianModel, compiled, privateKey) {
-        console.log("Deploy Contract with private Key ", privateKey);
-        let deployedModel = await this.basicEnzianYellow.deployEnzianProcessSelfSigned(enzianModel, privateKey, compiled);
 
         return deployedModel;
     }
@@ -46,7 +42,7 @@ class EnzianYellow {
             await this.web3Wrapper.init();
         }
 
-        let parsedBPMN = await parseBPMN(bpmnModel);
+        let parsedBPMN = await this.parseBpmnModel(bpmnModel);
         let deployedModel = await this.basicEnzianYellow.deployEnzianProcess(parsedBPMN, this.web3Wrapper.accounts[0]);
 
         return { parsedBPMN, deployedModel };

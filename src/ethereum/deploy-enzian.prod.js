@@ -11,24 +11,16 @@ const deployContractAndLibrary = async(web3Wrapper, compiled, privateKey) => {
   if(!privateKey){
     opts = { from: web3Wrapper.accounts[0]  }
   }
-  
-  let basicEnzian_deployed;
-  if(compiled) {
-    basicEnzian_deployed = await web3Wrapper.deployContractByAbiAndBytecode(compiled.abi, compiled.evm.bytecode.object, opts, privateKey);
-  } else {
-    basicEnzian_deployed = await web3Wrapper.deployContractByAbiAndBytecode(basicEnzianCompiled.abi, basicEnzianCompiled.evm.bytecode.object, opts, privateKey);
+  let tempCompiled = compiled;
+  if(!tempCompiled){
+    tempCompiled = basicEnzianCompiled;
   }
 
+  let basicEnzian_deployed = await web3Wrapper.deployContractByAbiAndBytecode(tempCompiled.abi, tempCompiled.evm.bytecode.object, opts, privateKey);
 
-  
-
-
-
-
-
-    return {
-      basicEnzian: basicEnzian_deployed
-    };
+   return {
+     basicEnzian: basicEnzian_deployed
+   };
 }
 
 module.exports = deployContractAndLibrary;
