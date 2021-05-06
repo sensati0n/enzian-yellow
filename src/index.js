@@ -9,6 +9,7 @@ class EnzianYellow {
         this.basicEnzianYellow = new BasicEnzianYellow(this.web3Wrapper);
     }
 
+
     async parseBpmnModel(bpmnModel) {
         return await parseBPMN(bpmnModel);
     }
@@ -56,20 +57,19 @@ class EnzianYellow {
         return this.basicEnzianYellow.executeTask(instance, task, account);
     }
 
-    async executeTaskByAddress(contractAddress, task) {
+    /**
+     * Executes Task by Contract Address and Task ID.
+     * @param contractAddress
+     * @param task ID
+     * @param privateKey OPTIONAL
+     * @returns {Promise<Event>}
+     */
+    async executeTaskByAddress(contractAddress, task, privateKey) {
         if(!this.web3Wrapper.initialized) {
             await this.web3Wrapper.init();
         }
-        return this.basicEnzianYellow.executeTaskByAddress(contractAddress, task);
+        return this.basicEnzianYellow.executeTaskByAddress(contractAddress, task, privateKey);
     }
-
-    async executeTaskBySelfSigned(contractAddress, task, privateKey) {
-        if(!this.web3Wrapper.initialized) {
-            await this.web3Wrapper.init();
-        }
-        return this.basicEnzianYellow.executeTaskByAddressSelfSigned(contractAddress, task, privateKey);
-    }
-
 
     async updateProcessVariable(instance, variableName, newValue, account) {
         return this.basicEnzianYellow.updateProcessVariable(instance, variableName, newValue, account);

@@ -184,12 +184,52 @@ class BasicEnzianYellow {
 
     }
 
-
     async executeTask(contractInstance, task, account) {
         
         let receipt = await contractInstance.methods.completing(task)
            .send({ from: account, gas: 1000000 })
            return receipt.events.TaskCompleted.returnValues.success;
+    }
+
+    async executeTaskByAddress(contractAddress, task, privateKey) {
+
+        var localContractInstance = new this.web3Wrapper.web3.eth.Contract( basicEnzianCompiled.abi, contractAddress);
+        if (privateKey){
+            const fromAddress = this.web3Wrapper.web3.eth.accounts.privateKeyToAccount(privateKey).address;
+
+
+
+
+            let txString = localContractInstance.methods.completing(task);
+
+            var tx = {
+                gas: this.web3Wrapper.web3.utils.toHex('5000000'),
+                data: txString
+            };
+            console.log('tx', tx)
+
+            const signed = await this.web3Wrapper.web3.eth.accounts.signTransaction({
+                to: contractAddress,
+                fromAddress,
+                value: '0',
+                data: txString.encodeABI(),
+                //  gas: Math.round((await txString.estimateGas({ fromAddress })) * 1.5),
+                gas: this.web3Wrapper.web3.utils.toHex('5000000'),
+
+            }, privateKey)
+            console.log('signed', signed)
+
+
+            let returnTx = await this.web3Wrapper.web3.eth.sendSignedTransaction(signed.rawTransaction)
+            console.log('rtx', returnTx)
+
+            return returnTx.events.TaskCompleted.returnValues.success;
+        } else {
+            let receipt = await localContractInstance.methods.completing(task)
+                .send({ from: this.web3Wrapper.accounts[0], gas: 1000000 })
+            return receipt.events.TaskCompleted.returnValues.success;
+        }
+
     }
 
     async updateProcessVariable(contractInstance, variableName, newValue, account) {
@@ -199,51 +239,6 @@ class BasicEnzianYellow {
     async eventlog(contractInstance) {
         let eventLog = await contractInstance.methods.getDebugStringeventLog().call({from: this.web3Wrapper.accounts[0]});
         return eventLog;
-    }
-
-    async executeTaskByAddress(contractAddress, task) {
-
-        var localContractInstance = new this.web3Wrapper.web3.eth.Contract( basicEnzianCompiled.abi, contractAddress);
-        let receipt = await localContractInstance.methods.completing(task)
-        .send({ from: this.web3Wrapper.accounts[0], gas: 1000000 })
-        return receipt.events.TaskCompleted.returnValues.success;
-    }
-
-    async executeTaskByAddressSelfSigned(contractAddress, task, privateKey) {
-
-        var localContractInstance = new this.web3Wrapper.web3.eth.Contract( basicEnzianCompiled.abi, contractAddress);
-        const fromAddress = this.web3Wrapper.web3.eth.accounts.privateKeyToAccount(privateKey).address;
-
-
-
-
-        let txString = localContractInstance.methods.completing(task);
-
-        var tx = {
-            gas: this.web3Wrapper.web3.utils.toHex('5000000'),
-            data: txString
-           };
-
-           console.log('tx', tx)
-
-       const signed = await this.web3Wrapper.web3.eth.accounts.signTransaction({
-        to: contractAddress,
-        fromAddress,
-        value: '0',
-        data: txString.encodeABI(),
-        //  gas: Math.round((await txString.estimateGas({ fromAddress })) * 1.5),
-        gas: this.web3Wrapper.web3.utils.toHex('5000000'),
-
-    }, privateKey)
-
-    console.log('signed', signed)
-
-           
-       let returnTx = await this.web3Wrapper.web3.eth.sendSignedTransaction(signed.rawTransaction)
-       console.log('rtx', returnTx)
-
-        // return returnTx.events.TaskCompleted.returnValues.success;
-        return returnTx;
     }
 
     async eventlogByAddress(contractAddress) {
