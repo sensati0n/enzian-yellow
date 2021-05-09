@@ -5,6 +5,7 @@ const BasicEnzianYellow = require('./ethereum');
 class EnzianYellow {
 
     constructor(provider) {
+        console.log("Enzian-Dev!");
         this.web3Wrapper = new Web3Wrapper(provider);
         this.basicEnzianYellow = new BasicEnzianYellow(this.web3Wrapper);
     }

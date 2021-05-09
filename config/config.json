@@ -1,10 +1,10 @@
 {
 
     "development":{
-        "node_http_port": 3000,
+        "node_http_port": 8085,
         "node_http_url": "http://127.0.0.1",
         "node_account_password": "root",
-        "node_account_address": "0xf954249a1e876a60674bf24e446197d20b559610",
+        "node_account_address": "0xd544990c04e9d84a21acd228d16bc9a76de6d186",
         "chain_type": "ethereum"
     }
 
