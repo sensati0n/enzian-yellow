@@ -88,7 +88,7 @@ class BasicEnzianYellow {
         
         console.log('the deployed contract is now wrapped:', localContractInstance)
 
-       for(let count = 0; count < parsedBPMN.obj.length; count++) {
+        for(let count = 0; count < parsedBPMN.obj.length; count++) {
            let elem = parsedBPMN.obj[count];
 
 
